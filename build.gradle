@@ -1,0 +1,12 @@
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
