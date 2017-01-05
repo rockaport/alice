@@ -14,6 +14,38 @@ public class AliceTest {
     private static final ByteString message = ByteString.encodeUtf8("Some message to ");
 
     @Nested
+    @DisplayName("Instantiation")
+    class Instantiation {
+        @Test
+        @DisplayName("Null context")
+        void nullContext(TestInfo testInfo) {
+            assertAll("Instantiation should throw with null context",
+                    () -> assertThrows(RuntimeException.class, () -> new Alice(null)));
+        }
+
+        @Test
+        @DisplayName("Null algorithm")
+        void nullAlgorithm(TestInfo testInfo) {
+            assertAll("Instantiation should throw with null algorithm",
+                    () -> assertThrows(RuntimeException.class, () -> new Alice(new AliceContextBuilder().setAlgorithm(null).build())));
+        }
+
+        @Test
+        @DisplayName("Null mode")
+        void nullMode(TestInfo testInfo) {
+            assertAll("Instantiation should throw with null mode",
+                    () -> assertThrows(RuntimeException.class, () -> new Alice(new AliceContextBuilder().setMode(null).build())));
+        }
+
+        @Test
+        @DisplayName("Null padding")
+        void nullPadding(TestInfo testInfo) {
+            assertAll("Instantiation should throw with null padding",
+                    () -> assertThrows(RuntimeException.class, () -> new Alice(new AliceContextBuilder().setPadding(null).build())));
+        }
+    }
+
+    @Nested
     @DisplayName("AES")
     class Aes {
         @Test
@@ -499,6 +531,15 @@ public class AliceTest {
 
             assertThrows(RuntimeException.class, () -> alice.decrypt(alice.encrypt(message.toByteArray(), password), badPassword));
         }
+
+        @Test
+        @DisplayName("Null MAC algorithm and/or password")
+        void nullMacAndPassword(TestInfo testInfo) {
+            assertAll("getMac should throw on null algorithm and/or password",
+                    () -> assertThrows(RuntimeException.class, () -> Alice.getMac(null, password)),
+                    () -> assertThrows(RuntimeException.class, () -> Alice.getMac(AliceContext.MacAlgorithm.HMAC_SHA_1, null)),
+                    () -> assertThrows(RuntimeException.class, () -> Alice.getMac(null, null)));
+        }
     }
 
     @Nested
@@ -526,6 +567,12 @@ public class AliceTest {
             byte[] key = Alice.generateKey(AliceContext.KeyLength.BITS_256);
 
             assertEquals(key.length, AliceContext.KeyLength.BITS_256.bytes());
+        }
+
+        @Test
+        @DisplayName("Null key")
+        void nullKey(TestInfo testInfo) {
+            assertThrows(RuntimeException.class, () -> Alice.generateKey(null));
         }
     }
 }

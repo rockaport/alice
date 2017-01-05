@@ -24,11 +24,19 @@ public class Alice {
      * @param context an {@link com.rockaport.alice.AliceContext}
      */
     public Alice(AliceContext context) {
-        this.context = context;
-
         try {
+            if (context == null ||
+                    context.getAlgorithm() == null ||
+                    context.getMode() == null ||
+                    context.getPadding() == null) {
+
+                throw new IllegalArgumentException("Context, algorithm, mode, or padding is null");
+            }
+
+            this.context = context;
+
             cipher = Cipher.getInstance(context.getAlgorithm() + "/" + context.getMode() + "/" + context.getPadding());
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
@@ -50,22 +58,6 @@ public class Alice {
     }
 
     /**
-     * Converts a byte array to a char array
-     *
-     * @param bytes input
-     * @return char array
-     */
-    private static char[] toChars(byte[] bytes) {
-        char[] chars = new char[bytes.length];
-
-        for (int i = 0; i < bytes.length; i++) {
-            chars[i] = (char) bytes[i];
-        }
-
-        return chars;
-    }
-
-    /**
      * Generates an AES key
      *
      * @param keyLength length of key
@@ -73,10 +65,42 @@ public class Alice {
      */
     public static byte[] generateKey(AliceContext.KeyLength keyLength) {
         try {
+            if (keyLength == null) {
+                throw new IllegalArgumentException("KeyLength is null");
+            }
+
             KeyGenerator keyGenerator = KeyGenerator.getInstance(AliceContext.Algorithm.AES.toString());
+
             keyGenerator.init(keyLength.bits());
+
             return keyGenerator.generateKey().getEncoded();
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Gets a {@link javax.crypto.Mac} instance
+     *
+     * @param password a password
+     * @return an initialized {@link javax.crypto.Mac}
+     */
+    public static Mac getMac(AliceContext.MacAlgorithm macAlgorithm, char[] password) {
+        try {
+            if (macAlgorithm == null) {
+                throw new IllegalArgumentException("Algorithm is null");
+            }
+
+            if (password == null || password.length == 0) {
+                throw new IllegalArgumentException("Password is null or empty");
+            }
+
+            Mac mac = Mac.getInstance(macAlgorithm.toString());
+
+            mac.init(new SecretKeySpec(toBytes(password), macAlgorithm.toString()));
+
+            return mac;
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
@@ -96,30 +120,26 @@ public class Alice {
 
             byte[] key = new byte[context.getKeyLength().bytes()];
 
-            switch (context.getPbkdf()) {
-                case NONE:
-                    System.arraycopy(toBytes(password), 0,
-                            key, 0,
-                            Math.min(context.getKeyLength().bytes(), password.length));
-                    break;
-                case SHA_1:
-                case SHA_224:
-                case SHA_256:
-                case SHA_384:
-                case SHA_512:
-                    byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
-                    System.arraycopy(hashedPassword, 0,
-                            key, 0,
-                            Math.min(context.getKeyLength().bytes(), hashedPassword.length));
-                    break;
-                case PBKDF_2_WITH_HMAC_SHA_1:
-                case PBKDF_2_WITH_HMAC_SHA_256:
-                case PBKDF_2_WITH_HMAC_SHA_384:
-                case PBKDF_2_WITH_HMAC_SHA_512:
-                    key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
-                            .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
-                            .getEncoded();
-                    break;
+            if (context.getPbkdf() == AliceContext.Pbkdf.NONE) {
+                System.arraycopy(toBytes(password), 0,
+                        key, 0,
+                        Math.min(context.getKeyLength().bytes(), password.length));
+            } else if (context.getPbkdf() == AliceContext.Pbkdf.SHA_1 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.SHA_224 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.SHA_256 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.SHA_384 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.SHA_512) {
+                byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
+                System.arraycopy(hashedPassword, 0,
+                        key, 0,
+                        Math.min(context.getKeyLength().bytes(), hashedPassword.length));
+            } else if (context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_1 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_256 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_384 ||
+                    context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_512) {
+                key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
+                        .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
+                        .getEncoded();
             }
 
             return new SecretKeySpec(key, "AES");
@@ -158,19 +178,13 @@ public class Alice {
             output.write(cipher.getIV());
             output.write(encryptedBytes);
 
-            // compute the MAC if needed
-            switch (context.getMacAlgorithm()) {
-                case HMAC_SHA_1:
-                case HMAC_SHA_256:
-                case HMAC_SHA_384:
-                case HMAC_SHA_512:
-                    // generate and append the MAC (IV || CIPHER || MAC)
-                    output.write(getMac(password).doFinal(encryptedBytes));
-                    break;
+            // compute the MAC if needed and append the MAC (IV || CIPHER || MAC)
+            if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
+                output.write(getMac(context.getMacAlgorithm(), password).doFinal(encryptedBytes));
             }
 
             return output.readByteArray();
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
@@ -191,31 +205,24 @@ public class Alice {
             // deconstruct the input
             byte[] initializationVector = Arrays.copyOfRange(input, 0, IV_LENGTH);
 
-            byte[] cipherText = null;
+            byte[] cipherText;
 
             // extract the MAC if needed
-            switch (context.getMacAlgorithm()) {
-                case NONE:
-                    cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length);
-                    break;
-                case HMAC_SHA_1:
-                case HMAC_SHA_256:
-                case HMAC_SHA_384:
-                case HMAC_SHA_512:
-                    Mac mac = getMac(password);
+            if (context.getMacAlgorithm() == AliceContext.MacAlgorithm.NONE) {
+                cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length);
+            } else {
+                Mac mac = getMac(context.getMacAlgorithm(), password);
 
-                    cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length - mac.getMacLength());
-                    byte[] recMac = Arrays.copyOfRange(input, input.length - mac.getMacLength(), input.length);
+                cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length - mac.getMacLength());
+                byte[] recMac = Arrays.copyOfRange(input, input.length - mac.getMacLength(), input.length);
 
-                    // compute the mac
-                    byte[] macBytes = mac.doFinal(cipherText);
+                // compute the mac
+                byte[] macBytes = mac.doFinal(cipherText);
 
-                    // verify the macs are the same
-                    if (!Arrays.equals(recMac, macBytes)) {
-                        throw new GeneralSecurityException("Received mac is different from calculated");
-                    }
-
-                    break;
+                // verify the macs are the same
+                if (!Arrays.equals(recMac, macBytes)) {
+                    throw new GeneralSecurityException("Received mac is different from calculated");
+                }
             }
 
             // decrypt
@@ -225,23 +232,6 @@ public class Alice {
 
             return cipher.doFinal(cipherText);
         } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Gets a {@link javax.crypto.Mac} instance
-     *
-     * @param password a password
-     * @return an initialized {@link javax.crypto.Mac}
-     */
-    private Mac getMac(char[] password) {
-        try {
-            Mac mac = Mac.getInstance(context.getMacAlgorithm().toString());
-            mac.init(new SecretKeySpec(toBytes(password), context.getMacAlgorithm().toString()));
-
-            return mac;
-        } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }

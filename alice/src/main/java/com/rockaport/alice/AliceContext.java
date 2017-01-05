@@ -77,10 +77,6 @@ public class AliceContext {
             this.value = value;
         }
 
-        public String value() {
-            return value;
-        }
-
         @Override
         public String toString() {
             return value;
@@ -103,10 +99,6 @@ public class AliceContext {
 
         Mode(String value) {
             this.value = value;
-        }
-
-        public String value() {
-            return value;
         }
 
         @Override
@@ -133,10 +125,6 @@ public class AliceContext {
 
         Padding(String value) {
             this.value = value;
-        }
-
-        public String value() {
-            return value;
         }
 
         @Override
@@ -188,10 +176,6 @@ public class AliceContext {
 
         MacAlgorithm(String value) {
             this.value = value;
-        }
-
-        public String value() {
-            return value;
         }
 
         @Override
@@ -257,10 +241,6 @@ public class AliceContext {
 
         Pbkdf(String value) {
             this.value = value;
-        }
-
-        public String value() {
-            return value;
         }
 
         @Override
