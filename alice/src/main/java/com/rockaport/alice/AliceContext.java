@@ -93,7 +93,12 @@ public class AliceContext {
          * Counter/CBC Mode, as defined in <a href="http://csrc.nist.gov/publications/nistpubs/800-38C/SP800-38C_updated-July20_2007.pdf">
          * NIST Special Publication SP 800-38C</a>
          */
-        CTR("CTR");
+        CTR("CTR"),
+        /**
+         * Galois/Counter Mode, as defined in
+         * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>.
+         */
+        GCM("GCM");
 
         private String value;
 

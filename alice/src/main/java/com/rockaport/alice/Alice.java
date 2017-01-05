@@ -3,12 +3,14 @@ package com.rockaport.alice;
 import okio.Buffer;
 
 import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
 public class Alice {
@@ -164,10 +166,17 @@ public class Alice {
             // generate the initialization vector
             byte[] initializationVector = generateInitializationVector();
 
+            AlgorithmParameterSpec algorithmParameterSpec = null;
+            if (context.getMode() == AliceContext.Mode.CBC || context.getMode() == AliceContext.Mode.CTR) {
+                algorithmParameterSpec = new IvParameterSpec(initializationVector);
+            } else if (context.getMode() == AliceContext.Mode.GCM) {
+                algorithmParameterSpec = new GCMParameterSpec(IV_LENGTH << 3, initializationVector);
+            }
+
             // initialize the cipher
             cipher.init(Cipher.ENCRYPT_MODE,
                     deriveKey(password, initializationVector),
-                    new IvParameterSpec(initializationVector));
+                    algorithmParameterSpec);
 
             // encrypt
             byte[] encryptedBytes = cipher.doFinal(input);
@@ -225,10 +234,17 @@ public class Alice {
                 }
             }
 
-            // decrypt
+            AlgorithmParameterSpec algorithmParameterSpec = null;
+            if (context.getMode() == AliceContext.Mode.CBC || context.getMode() == AliceContext.Mode.CTR) {
+                algorithmParameterSpec = new IvParameterSpec(initializationVector);
+            } else if (context.getMode() == AliceContext.Mode.GCM) {
+                algorithmParameterSpec = new GCMParameterSpec(IV_LENGTH << 3, initializationVector);
+            }
+
+            // initialize the cipher
             cipher.init(Cipher.DECRYPT_MODE,
                     deriveKey(password, initializationVector),
-                    new IvParameterSpec(initializationVector));
+                    algorithmParameterSpec);
 
             return cipher.doFinal(cipherText);
         } catch (GeneralSecurityException | IllegalArgumentException e) {

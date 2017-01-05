@@ -325,6 +325,114 @@ public class AliceTest {
                 }
             }
         }
+
+        @Nested
+        @DisplayName("GCM")
+        class Gcm {
+            @Nested
+            @DisplayName("NoPadding")
+            class NoPadding {
+                @Test
+                @DisplayName("128")
+                void aesCbcNoPadding128(TestInfo testInfo) {
+                    Alice alice = new Alice(new AliceContextBuilder()
+                            .setAlgorithm(AliceContext.Algorithm.AES)
+                            .setMode(AliceContext.Mode.GCM)
+                            .setPadding(AliceContext.Padding.NO_PADDING)
+                            .setKeyLength(AliceContext.KeyLength.BITS_128)
+                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                            .build());
+
+                    ByteString decryptedMessage = ByteString.of(alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                }
+
+                @Test
+                @DisplayName("192")
+                void aesGcmNoPadding192(TestInfo testInfo) {
+                    Alice alice = new Alice(new AliceContextBuilder()
+                            .setAlgorithm(AliceContext.Algorithm.AES)
+                            .setMode(AliceContext.Mode.GCM)
+                            .setPadding(AliceContext.Padding.NO_PADDING)
+                            .setKeyLength(AliceContext.KeyLength.BITS_192)
+                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                            .build());
+
+                    ByteString decryptedMessage = ByteString.of(alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                }
+
+                @Test
+                @DisplayName("256")
+                void aesGcmNoPadding256(TestInfo testInfo) {
+                    Alice alice = new Alice(new AliceContextBuilder()
+                            .setAlgorithm(AliceContext.Algorithm.AES)
+                            .setMode(AliceContext.Mode.GCM)
+                            .setPadding(AliceContext.Padding.NO_PADDING)
+                            .setKeyLength(AliceContext.KeyLength.BITS_256)
+                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                            .build());
+
+                    ByteString decryptedMessage = ByteString.of(alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                }
+            }
+
+            @Nested
+            @DisplayName("PKCS5Padding")
+            class Pkcs5Padding {
+                @Test
+                @DisplayName("128")
+                void aesGcmPKCS5Padding128(TestInfo testInfo) {
+                    Alice alice = new Alice(new AliceContextBuilder()
+                            .setAlgorithm(AliceContext.Algorithm.AES)
+                            .setMode(AliceContext.Mode.GCM)
+                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                            .setKeyLength(AliceContext.KeyLength.BITS_128)
+                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                            .build());
+
+                    ByteString decryptedMessage = ByteString.of(alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                }
+
+                @Test
+                @DisplayName("192")
+                void aesGcmPKCS5Padding192(TestInfo testInfo) {
+                    Alice alice = new Alice(new AliceContextBuilder()
+                            .setAlgorithm(AliceContext.Algorithm.AES)
+                            .setMode(AliceContext.Mode.GCM)
+                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                            .setKeyLength(AliceContext.KeyLength.BITS_192)
+                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                            .build());
+
+                    ByteString decryptedMessage = ByteString.of(alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                }
+
+                @Test
+                @DisplayName("256")
+                void aesGcmPKCS5Padding256(TestInfo testInfo) {
+                    Alice alice = new Alice(new AliceContextBuilder()
+                            .setAlgorithm(AliceContext.Algorithm.AES)
+                            .setMode(AliceContext.Mode.GCM)
+                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                            .setKeyLength(AliceContext.KeyLength.BITS_256)
+                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                            .build());
+
+                    ByteString decryptedMessage = ByteString.of(alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                }
+            }
+        }
     }
 
     @Nested
