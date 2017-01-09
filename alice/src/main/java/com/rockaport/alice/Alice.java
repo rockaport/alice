@@ -149,6 +149,13 @@ public class Alice {
         }
     }
 
+    /**
+     * Encrypts the input file using the supplied password
+     *
+     * @param input    the input file
+     * @param output   the output file
+     * @param password the password
+     */
     public synchronized void encrypt(File input, File output, char[] password) {
         BufferedInputStream bufferedInputStream = null;
         BufferedOutputStream bufferedOutputStream = null;
@@ -270,6 +277,13 @@ public class Alice {
         }
     }
 
+    /**
+     * Decrypts an input file using the supplied password
+     *
+     * @param input    the input file
+     * @param output   the output file
+     * @param password the password
+     */
     public synchronized void decrypt(File input, File output, char[] password) {
         BufferedInputStream bufferedInputStream = null;
         BufferedOutputStream bufferedOutputStream = null;
@@ -299,7 +313,7 @@ public class Alice {
             // setup streams
             bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(output));
             bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
-
+            4
             // read the initialization vector
             byte[] initializationVector = new byte[IV_LENGTH];
 
