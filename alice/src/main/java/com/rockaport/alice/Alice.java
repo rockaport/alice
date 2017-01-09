@@ -69,7 +69,8 @@ public class Alice {
     /**
      * Gets a {@link javax.crypto.Mac} instance
      *
-     * @param password a password
+     * @param macAlgorithm the {@link com.rockaport.alice.AliceContext.MacAlgorithm}
+     * @param password     a password
      * @return an initialized {@link javax.crypto.Mac}
      */
     public static Mac getMac(AliceContext.MacAlgorithm macAlgorithm, char[] password) {
@@ -313,7 +314,7 @@ public class Alice {
             // setup streams
             bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(output));
             bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
-            4
+
             // read the initialization vector
             byte[] initializationVector = new byte[IV_LENGTH];
 
