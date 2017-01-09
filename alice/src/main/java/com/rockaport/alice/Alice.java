@@ -7,6 +7,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -41,22 +42,6 @@ public class Alice {
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Performs a narrowing byte-to-char conversion
-     *
-     * @param chars input
-     * @return byte conversion
-     */
-    private static byte[] toBytes(char[] chars) {
-        byte[] bytes = new byte[chars.length];
-
-        for (int i = 0; i < chars.length; i++) {
-            bytes[i] = (byte) chars[i];
-        }
-
-        return bytes;
     }
 
     /**
@@ -108,46 +93,19 @@ public class Alice {
     }
 
     /**
-     * Derives an AES {@link javax.crypto.spec.SecretKeySpec} using a password and iteration count (if needed).
+     * Performs a narrowing byte-to-char conversion
      *
-     * @param password             the password
-     * @param initializationVector used for PBKDF
-     * @return an AES {@link javax.crypto.spec.SecretKeySpec}
+     * @param chars input
+     * @return byte conversion
      */
-    private SecretKey deriveKey(char[] password, byte[] initializationVector) {
-        try {
-            if (password == null || password.length == 0) {
-                throw new IllegalArgumentException("Password is either null or empty");
-            }
+    private static byte[] toBytes(char[] chars) {
+        byte[] bytes = new byte[chars.length];
 
-            byte[] key = new byte[context.getKeyLength().bytes()];
-
-            if (context.getPbkdf() == AliceContext.Pbkdf.NONE) {
-                System.arraycopy(toBytes(password), 0,
-                        key, 0,
-                        Math.min(context.getKeyLength().bytes(), password.length));
-            } else if (context.getPbkdf() == AliceContext.Pbkdf.SHA_1 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.SHA_224 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.SHA_256 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.SHA_384 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.SHA_512) {
-                byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
-                System.arraycopy(hashedPassword, 0,
-                        key, 0,
-                        Math.min(context.getKeyLength().bytes(), hashedPassword.length));
-            } else if (context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_1 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_256 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_384 ||
-                    context.getPbkdf() == AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_512) {
-                key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
-                        .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
-                        .getEncoded();
-            }
-
-            return new SecretKeySpec(key, "AES");
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
+        for (int i = 0; i < chars.length; i++) {
+            bytes[i] = (byte) chars[i];
         }
+
+        return bytes;
     }
 
     /**
@@ -166,17 +124,10 @@ public class Alice {
             // generate the initialization vector
             byte[] initializationVector = generateInitializationVector();
 
-            AlgorithmParameterSpec algorithmParameterSpec = null;
-            if (context.getMode() == AliceContext.Mode.CBC || context.getMode() == AliceContext.Mode.CTR) {
-                algorithmParameterSpec = new IvParameterSpec(initializationVector);
-            } else if (context.getMode() == AliceContext.Mode.GCM) {
-                algorithmParameterSpec = new GCMParameterSpec(IV_LENGTH << 3, initializationVector);
-            }
-
             // initialize the cipher
             cipher.init(Cipher.ENCRYPT_MODE,
                     deriveKey(password, initializationVector),
-                    algorithmParameterSpec);
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
 
             // encrypt
             byte[] encryptedBytes = cipher.doFinal(input);
@@ -195,6 +146,80 @@ public class Alice {
             return output.readByteArray();
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public synchronized void encrypt(File input, File output, char[] password) {
+        BufferedInputStream bufferedInputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+
+        try {
+            if (input == null || !input.exists() || input.length() <= 0) {
+                throw new RuntimeException("Input file is either null or does not exist");
+            }
+
+            // generate the initialization vector
+            byte[] initializationVector = generateInitializationVector();
+
+            // initialize the cipher
+            cipher.init(Cipher.ENCRYPT_MODE,
+                    deriveKey(password, initializationVector),
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+
+            // initialize the mac if needed
+            Mac mac = null;
+
+            if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
+                mac = getMac(context.getMacAlgorithm(), password);
+            }
+
+            // allocate variables
+            int bytesRead;
+            byte[] encryptedBytes;
+            byte[] inputStreamBuffer = new byte[4096];
+
+            // setup streams
+            bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
+            bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(output));
+
+            // write the initialization vector
+            bufferedOutputStream.write(initializationVector);
+
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+                // encrypt
+                encryptedBytes = cipher.update(inputStreamBuffer, 0, bytesRead);
+
+                bufferedOutputStream.write(encryptedBytes);
+
+                // compute the mac if needed
+                if (mac != null) {
+                    mac.update(encryptedBytes, 0, bytesRead);
+                }
+            }
+
+            // finalize and write the cipher
+            bufferedOutputStream.write(cipher.doFinal());
+
+            // write the mac
+            if (mac != null) {
+                bufferedOutputStream.write(mac.doFinal());
+            }
+        } catch (GeneralSecurityException | IllegalArgumentException | IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (bufferedInputStream != null) {
+                try {
+                    bufferedInputStream.close();
+                } catch (IOException ignored) {
+                }
+            }
+
+            if (bufferedOutputStream != null) {
+                try {
+                    bufferedOutputStream.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
@@ -234,22 +259,179 @@ public class Alice {
                 }
             }
 
-            AlgorithmParameterSpec algorithmParameterSpec = null;
-            if (context.getMode() == AliceContext.Mode.CBC || context.getMode() == AliceContext.Mode.CTR) {
-                algorithmParameterSpec = new IvParameterSpec(initializationVector);
-            } else if (context.getMode() == AliceContext.Mode.GCM) {
-                algorithmParameterSpec = new GCMParameterSpec(IV_LENGTH << 3, initializationVector);
-            }
-
             // initialize the cipher
             cipher.init(Cipher.DECRYPT_MODE,
                     deriveKey(password, initializationVector),
-                    algorithmParameterSpec);
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
 
             return cipher.doFinal(cipherText);
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public synchronized void decrypt(File input, File output, char[] password) {
+        BufferedInputStream bufferedInputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+
+        try {
+            if (input == null || !input.exists() || input.length() <= 0) {
+                throw new RuntimeException("Input file is either null or does not exist");
+            }
+
+            // read the mac if needed
+            Mac mac = null;
+            byte[] recMac = null;
+
+            if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
+                mac = getMac(context.getMacAlgorithm(), password);
+
+                recMac = new byte[mac.getMacLength()];
+
+                RandomAccessFile randomAccessFile = new RandomAccessFile(input, "r");
+
+                randomAccessFile.seek(randomAccessFile.length() - mac.getMacLength());
+                randomAccessFile.read(recMac);
+
+                randomAccessFile.close();
+            }
+
+            // setup streams
+            bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(output));
+            bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
+
+            // read the initialization vector
+            byte[] initializationVector = new byte[IV_LENGTH];
+
+            int ivBytesRead = bufferedInputStream.read(initializationVector);
+
+            if (ivBytesRead < IV_LENGTH) {
+                throw new IOException("File doesn't contain an IV");
+            }
+
+            // initialize the cipher
+            cipher.init(Cipher.DECRYPT_MODE,
+                    deriveKey(password, initializationVector),
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+
+            // allocate loop buffers and variables
+            int bytesRead;
+            int numBytesToProcess;
+            byte[] inputStreamBuffer = new byte[4096];
+            long bytesLeft = input.length() - IV_LENGTH;
+
+            // subtract the mac length if enabled
+            if (mac != null) {
+                bytesLeft -= mac.getMacLength();
+            }
+
+            // decrypt
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+                numBytesToProcess = (bytesRead < bytesLeft) ? bytesRead : (int) bytesLeft;
+
+                bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, numBytesToProcess));
+
+                // reduce the number of bytes left
+                bytesLeft -= numBytesToProcess;
+
+                // compute the mac if needed
+                if (mac != null) {
+                    mac.update(inputStreamBuffer, 0, numBytesToProcess);
+                }
+            }
+
+            // finalize the cipher
+            bufferedOutputStream.write(cipher.doFinal());
+
+            // compare the mac
+            if (mac != null && !Arrays.equals(recMac, mac.doFinal())) {
+                throw new GeneralSecurityException("Received mac is different from calculated");
+            }
+        } catch (GeneralSecurityException | IllegalArgumentException | IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (bufferedInputStream != null) {
+                try {
+                    bufferedInputStream.close();
+                } catch (IOException ignored) {
+                }
+            }
+
+            if (bufferedOutputStream != null) {
+                try {
+                    bufferedOutputStream.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    /**
+     * Derives an AES {@link javax.crypto.spec.SecretKeySpec} using a password and iteration count (if needed).
+     *
+     * @param password             the password
+     * @param initializationVector used for PBKDF
+     * @return an AES {@link javax.crypto.spec.SecretKeySpec}
+     */
+    private SecretKey deriveKey(char[] password, byte[] initializationVector) {
+        try {
+            if (password == null || password.length == 0) {
+                throw new IllegalArgumentException("Password is either null or empty");
+            }
+
+            byte[] key = null;
+
+            switch (context.getPbkdf()) {
+                case NONE:
+                    key = new byte[context.getKeyLength().bytes()];
+
+                    System.arraycopy(toBytes(password), 0,
+                            key, 0,
+                            Math.min(context.getKeyLength().bytes(), password.length));
+                    break;
+                case SHA_1:
+                case SHA_224:
+                case SHA_256:
+                case SHA_384:
+                case SHA_512:
+                    key = new byte[context.getKeyLength().bytes()];
+
+                    byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
+
+                    System.arraycopy(hashedPassword, 0,
+                            key, 0,
+                            Math.min(context.getKeyLength().bytes(), hashedPassword.length));
+                    break;
+                case PBKDF_2_WITH_HMAC_SHA_1:
+                case PBKDF_2_WITH_HMAC_SHA_256:
+                case PBKDF_2_WITH_HMAC_SHA_384:
+                case PBKDF_2_WITH_HMAC_SHA_512:
+                    key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
+                            .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
+                            .getEncoded();
+                    break;
+            }
+
+            return new SecretKeySpec(key, "AES");
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private AlgorithmParameterSpec getAlgorithmParameterSpec(AliceContext.Mode mode, byte[] initializationVector) {
+        if (mode == null || initializationVector == null || initializationVector.length <= 0) {
+            throw new IllegalArgumentException("Mode or initialization vector is either null or empty");
+        }
+
+        switch (mode) {
+            case CBC:
+            case CTR:
+                return new IvParameterSpec(initializationVector);
+            case GCM:
+                return new GCMParameterSpec(IV_LENGTH << 3, initializationVector);
+        }
+
+        throw new IllegalArgumentException("Unknown mode");
     }
 
     /**
