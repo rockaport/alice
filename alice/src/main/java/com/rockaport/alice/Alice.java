@@ -14,6 +14,9 @@ import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
+/**
+ * The main Alice API for encryption and decryption of byte arrays and files.
+ */
 public class Alice {
     private static final int IV_LENGTH = 16;
     private final AliceContext context;

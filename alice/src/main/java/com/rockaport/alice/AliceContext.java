@@ -1,5 +1,9 @@
 package com.rockaport.alice;
 
+/**
+ * Context passed into {@link com.rockaport.alice.Alice}. You should use {@link com.rockaport.alice.AliceContextBuilder}
+ * to create this class as it contains many defaults.
+ */
 public class AliceContext {
     private Algorithm algorithm;
     private Mode mode;
@@ -83,6 +87,9 @@ public class AliceContext {
         }
     }
 
+    /**
+     * Mode used for the {@link javax.crypto.Cipher}
+     */
     public enum Mode {
         /**
          * Cipher Block Chaining Mode, as defined in <a href="http://csrc.nist.gov/publications/fips/fips81/fips81.htm">FIPS PUB
