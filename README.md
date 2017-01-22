@@ -1,5 +1,7 @@
 [![Circle
-CI](https://circleci.com/gh/rockaport/alice.svg?style=shield)](https://circleci.com/gh/rockaport/alice)
+CI](https://circleci.com/gh/rockaport/alice.svg?style=shield)](https://circleci.com/gh/rockaport/alice) 
+[![Release](https://jitpack.io/v/rockaport/alice.svg)]
+(https://jitpack.io/#rockaport/alice)
 
 # alice
 Java AES encryption library for working with byte arrays and files. Various key lengths, block modes, padding schemes, key deriviation functions, and Message Authentication Codes (MAC) are available. See the [javadoc](https://rockaport.github.io/alice) for more information.
