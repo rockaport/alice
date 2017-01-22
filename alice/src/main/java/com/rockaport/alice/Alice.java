@@ -29,20 +29,21 @@ public class Alice {
      *
      * @param context an {@link com.rockaport.alice.AliceContext}
      */
+    @SuppressWarnings("WeakerAccess")
     public Alice(AliceContext context) {
+        if (context == null ||
+                context.getAlgorithm() == null ||
+                context.getMode() == null ||
+                context.getPadding() == null) {
+
+            throw new IllegalArgumentException("Context, algorithm, mode, or padding is null");
+        }
+
+        this.context = context;
+
         try {
-            if (context == null ||
-                    context.getAlgorithm() == null ||
-                    context.getMode() == null ||
-                    context.getPadding() == null) {
-
-                throw new IllegalArgumentException("Context, algorithm, mode, or padding is null");
-            }
-
-            this.context = context;
-
             cipher = Cipher.getInstance(context.getAlgorithm() + "/" + context.getMode() + "/" + context.getPadding());
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
+        } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
@@ -52,21 +53,19 @@ public class Alice {
      *
      * @param keyLength length of key
      * @return a byte array
+     * @throws GeneralSecurityException if either initialization or generation fails
      */
-    public static byte[] generateKey(AliceContext.KeyLength keyLength) {
-        try {
-            if (keyLength == null) {
-                throw new IllegalArgumentException("KeyLength is null");
-            }
-
-            KeyGenerator keyGenerator = KeyGenerator.getInstance(AliceContext.Algorithm.AES.toString());
-
-            keyGenerator.init(keyLength.bits());
-
-            return keyGenerator.generateKey().getEncoded();
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
+    @SuppressWarnings("WeakerAccess")
+    public static byte[] generateKey(AliceContext.KeyLength keyLength) throws GeneralSecurityException {
+        if (keyLength == null) {
+            throw new IllegalArgumentException("KeyLength is null");
         }
+
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(AliceContext.Algorithm.AES.toString());
+
+        keyGenerator.init(keyLength.bits());
+
+        return keyGenerator.generateKey().getEncoded();
     }
 
     /**
@@ -75,25 +74,23 @@ public class Alice {
      * @param macAlgorithm the {@link com.rockaport.alice.AliceContext.MacAlgorithm}
      * @param password     a password
      * @return an initialized {@link javax.crypto.Mac}
+     * @throws GeneralSecurityException if MAC initialization fails
      */
-    public static Mac getMac(AliceContext.MacAlgorithm macAlgorithm, char[] password) {
-        try {
-            if (macAlgorithm == null) {
-                throw new IllegalArgumentException("Algorithm is null");
-            }
-
-            if (password == null || password.length == 0) {
-                throw new IllegalArgumentException("Password is null or empty");
-            }
-
-            Mac mac = Mac.getInstance(macAlgorithm.toString());
-
-            mac.init(new SecretKeySpec(toBytes(password), macAlgorithm.toString()));
-
-            return mac;
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
+    @SuppressWarnings("WeakerAccess")
+    public static Mac getMac(AliceContext.MacAlgorithm macAlgorithm, char[] password) throws GeneralSecurityException {
+        if (macAlgorithm == null) {
+            throw new IllegalArgumentException("Algorithm is null");
         }
+
+        if (password == null || password.length == 0) {
+            throw new IllegalArgumentException("Password is null or empty");
+        }
+
+        Mac mac = Mac.getInstance(macAlgorithm.toString());
+
+        mac.init(new SecretKeySpec(toBytes(password), macAlgorithm.toString()));
+
+        return mac;
     }
 
     /**
@@ -118,39 +115,37 @@ public class Alice {
      * @param input    the byte array input
      * @param password the password
      * @return an encrypted byte array
+     * @throws GeneralSecurityException if initialization or encryption fails
      */
-    public synchronized byte[] encrypt(byte[] input, char[] password) {
-        try {
-            if (input == null || input.length == 0) {
-                throw new IllegalArgumentException("Input is either null or empty");
-            }
-
-            // generate the initialization vector
-            byte[] initializationVector = generateInitializationVector();
-
-            // initialize the cipher
-            cipher.init(Cipher.ENCRYPT_MODE,
-                    deriveKey(password, initializationVector),
-                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
-
-            // encrypt
-            byte[] encryptedBytes = cipher.doFinal(input);
-
-            // construct the output (IV || CIPHER)
-            Buffer output = new Buffer();
-
-            output.write(cipher.getIV());
-            output.write(encryptedBytes);
-
-            // compute the MAC if needed and append the MAC (IV || CIPHER || MAC)
-            if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
-                output.write(getMac(context.getMacAlgorithm(), password).doFinal(encryptedBytes));
-            }
-
-            return output.readByteArray();
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
+    @SuppressWarnings("WeakerAccess")
+    public synchronized byte[] encrypt(byte[] input, char[] password) throws GeneralSecurityException {
+        if (input == null || input.length == 0) {
+            throw new IllegalArgumentException("Input is either null or empty");
         }
+
+        // generate the initialization vector
+        byte[] initializationVector = generateInitializationVector();
+
+        // initialize the cipher
+        cipher.init(Cipher.ENCRYPT_MODE,
+                deriveKey(password, initializationVector),
+                getAlgorithmParameterSpec(context.getMode(), initializationVector));
+
+        // encrypt
+        byte[] encryptedBytes = cipher.doFinal(input);
+
+        // construct the output (IV || CIPHER)
+        Buffer output = new Buffer();
+
+        output.write(cipher.getIV());
+        output.write(encryptedBytes);
+
+        // compute the MAC if needed and append the MAC (IV || CIPHER || MAC)
+        if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
+            output.write(getMac(context.getMacAlgorithm(), password).doFinal(encryptedBytes));
+        }
+
+        return output.readByteArray();
     }
 
     /**
@@ -159,16 +154,19 @@ public class Alice {
      * @param input    the input file
      * @param output   the output file
      * @param password the password
+     * @throws GeneralSecurityException if initialization or encryption fails
+     * @throws IOException              if there's a failure to read/write from/to the input/output file
      */
-    public synchronized void encrypt(File input, File output, char[] password) {
+    @SuppressWarnings("WeakerAccess")
+    public synchronized void encrypt(File input, File output, char[] password) throws GeneralSecurityException, IOException {
+        if (input == null || !input.exists() || input.length() <= 0) {
+            throw new IllegalArgumentException("Input file is either null or does not exist");
+        }
+
         BufferedInputStream bufferedInputStream = null;
         BufferedOutputStream bufferedOutputStream = null;
 
         try {
-            if (input == null || !input.exists() || input.length() <= 0) {
-                throw new RuntimeException("Input file is either null or does not exist");
-            }
-
             // generate the initialization vector
             byte[] initializationVector = generateInitializationVector();
 
@@ -215,8 +213,6 @@ public class Alice {
             if (mac != null) {
                 bufferedOutputStream.write(mac.doFinal());
             }
-        } catch (GeneralSecurityException | IllegalArgumentException | IOException e) {
-            throw new RuntimeException(e);
         } finally {
             if (bufferedInputStream != null) {
                 try {
@@ -240,45 +236,43 @@ public class Alice {
      * @param input    the byte array input
      * @param password the password
      * @return a decrypted byte array
+     * @throws GeneralSecurityException if initialization, decryption, or the MAC comparison fails
      */
-    public synchronized byte[] decrypt(byte[] input, char[] password) {
-        try {
-            if (input == null || input.length == 0) {
-                throw new IllegalArgumentException("Input is either null or empty");
-            }
-
-            // deconstruct the input
-            byte[] initializationVector = Arrays.copyOfRange(input, 0, IV_LENGTH);
-
-            byte[] cipherText;
-
-            // extract the MAC if needed
-            if (context.getMacAlgorithm() == AliceContext.MacAlgorithm.NONE) {
-                cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length);
-            } else {
-                Mac mac = getMac(context.getMacAlgorithm(), password);
-
-                cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length - mac.getMacLength());
-                byte[] recMac = Arrays.copyOfRange(input, input.length - mac.getMacLength(), input.length);
-
-                // compute the mac
-                byte[] macBytes = mac.doFinal(cipherText);
-
-                // verify the macs are the same
-                if (!Arrays.equals(recMac, macBytes)) {
-                    throw new GeneralSecurityException("Received mac is different from calculated");
-                }
-            }
-
-            // initialize the cipher
-            cipher.init(Cipher.DECRYPT_MODE,
-                    deriveKey(password, initializationVector),
-                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
-
-            return cipher.doFinal(cipherText);
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
+    @SuppressWarnings("WeakerAccess")
+    public synchronized byte[] decrypt(byte[] input, char[] password) throws GeneralSecurityException {
+        if (input == null || input.length == 0) {
+            throw new IllegalArgumentException("Input is either null or empty");
         }
+
+        // deconstruct the input
+        byte[] initializationVector = Arrays.copyOfRange(input, 0, IV_LENGTH);
+
+        byte[] cipherText;
+
+        // extract the MAC if needed
+        if (context.getMacAlgorithm() == AliceContext.MacAlgorithm.NONE) {
+            cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length);
+        } else {
+            Mac mac = getMac(context.getMacAlgorithm(), password);
+
+            cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length - mac.getMacLength());
+            byte[] recMac = Arrays.copyOfRange(input, input.length - mac.getMacLength(), input.length);
+
+            // compute the mac
+            byte[] macBytes = mac.doFinal(cipherText);
+
+            // verify the macs are the same
+            if (!Arrays.equals(recMac, macBytes)) {
+                throw new GeneralSecurityException("Received mac is different from calculated");
+            }
+        }
+
+        // initialize the cipher
+        cipher.init(Cipher.DECRYPT_MODE,
+                deriveKey(password, initializationVector),
+                getAlgorithmParameterSpec(context.getMode(), initializationVector));
+
+        return cipher.doFinal(cipherText);
     }
 
     /**
@@ -287,16 +281,19 @@ public class Alice {
      * @param input    the input file
      * @param output   the output file
      * @param password the password
+     * @throws GeneralSecurityException if initialization or decryption fails
+     * @throws IOException              if there's a failure to read/write from/to the input/output file
      */
-    public synchronized void decrypt(File input, File output, char[] password) {
+    @SuppressWarnings("WeakerAccess")
+    public synchronized void decrypt(File input, File output, char[] password) throws GeneralSecurityException, IOException {
+        if (input == null || !input.exists() || input.length() <= 0) {
+            throw new IllegalArgumentException("Input file is either null or does not exist");
+        }
+
         BufferedInputStream bufferedInputStream = null;
         BufferedOutputStream bufferedOutputStream = null;
 
         try {
-            if (input == null || !input.exists() || input.length() <= 0) {
-                throw new RuntimeException("Input file is either null or does not exist");
-            }
-
             // read the mac if needed
             Mac mac = null;
             byte[] recMac = null;
@@ -365,8 +362,6 @@ public class Alice {
             if (mac != null && !Arrays.equals(recMac, mac.doFinal())) {
                 throw new GeneralSecurityException("Received mac is different from calculated");
             }
-        } catch (GeneralSecurityException | IllegalArgumentException | IOException e) {
-            throw new RuntimeException(e);
         } finally {
             if (bufferedInputStream != null) {
                 try {
@@ -390,50 +385,47 @@ public class Alice {
      * @param password             the password
      * @param initializationVector used for PBKDF
      * @return an AES {@link javax.crypto.spec.SecretKeySpec}
+     * @throws GeneralSecurityException if initialization, decryption, or the MAC comparison fails
      */
-    private SecretKey deriveKey(char[] password, byte[] initializationVector) {
-        try {
-            if (password == null || password.length == 0) {
-                throw new IllegalArgumentException("Password is either null or empty");
-            }
-
-            byte[] key = null;
-
-            switch (context.getPbkdf()) {
-                case NONE:
-                    key = new byte[context.getKeyLength().bytes()];
-
-                    System.arraycopy(toBytes(password), 0,
-                            key, 0,
-                            Math.min(context.getKeyLength().bytes(), password.length));
-                    break;
-                case SHA_1:
-                case SHA_224:
-                case SHA_256:
-                case SHA_384:
-                case SHA_512:
-                    key = new byte[context.getKeyLength().bytes()];
-
-                    byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
-
-                    System.arraycopy(hashedPassword, 0,
-                            key, 0,
-                            Math.min(context.getKeyLength().bytes(), hashedPassword.length));
-                    break;
-                case PBKDF_2_WITH_HMAC_SHA_1:
-                case PBKDF_2_WITH_HMAC_SHA_256:
-                case PBKDF_2_WITH_HMAC_SHA_384:
-                case PBKDF_2_WITH_HMAC_SHA_512:
-                    key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
-                            .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
-                            .getEncoded();
-                    break;
-            }
-
-            return new SecretKeySpec(key, "AES");
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw new RuntimeException(e);
+    private SecretKey deriveKey(char[] password, byte[] initializationVector) throws GeneralSecurityException {
+        if (password == null || password.length == 0) {
+            throw new IllegalArgumentException("Password is either null or empty");
         }
+
+        byte[] key = null;
+
+        switch (context.getPbkdf()) {
+            case NONE:
+                key = new byte[context.getKeyLength().bytes()];
+
+                System.arraycopy(toBytes(password), 0,
+                        key, 0,
+                        Math.min(context.getKeyLength().bytes(), password.length));
+                break;
+            case SHA_1:
+            case SHA_224:
+            case SHA_256:
+            case SHA_384:
+            case SHA_512:
+                key = new byte[context.getKeyLength().bytes()];
+
+                byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
+
+                System.arraycopy(hashedPassword, 0,
+                        key, 0,
+                        Math.min(context.getKeyLength().bytes(), hashedPassword.length));
+                break;
+            case PBKDF_2_WITH_HMAC_SHA_1:
+            case PBKDF_2_WITH_HMAC_SHA_256:
+            case PBKDF_2_WITH_HMAC_SHA_384:
+            case PBKDF_2_WITH_HMAC_SHA_512:
+                key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
+                        .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
+                        .getEncoded();
+                break;
+        }
+
+        return new SecretKeySpec(key, "AES");
     }
 
     private AlgorithmParameterSpec getAlgorithmParameterSpec(AliceContext.Mode mode, byte[] initializationVector) {
