@@ -82,6 +82,10 @@ public class AliceContext {
          * cipher supporting keys of 128, 192, and 256 bits.
          */
         AES("AES"),
+        /**
+         * The Digital Encryption Standard as described in
+         * <a href="http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf">FIPS PUB 46-3</a>
+         */
         DES("DES");
 
         private String value;
