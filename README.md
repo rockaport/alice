@@ -6,7 +6,7 @@ CI](https://circleci.com/gh/rockaport/alice.svg?style=shield)](https://circleci.
 Java AES encryption library for working with byte arrays and files. Various key lengths, block modes, padding schemes, key deriviation functions, and Message Authentication Codes (MAC) are available. See the [javadoc](https://rockaport.github.io/alice) for more information.
 
 # Download
-The easist way is to use [jitpack](https://jitpack.io/#rockaport/alice/0.2.0)
+The easist way is to use [jitpack](https://jitpack.io/#rockaport/alice/0.3.0)
 
 ## Initialization
 ```java
