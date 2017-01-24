@@ -26,6 +26,7 @@ public class AliceContext {
      * @param pbkdf        the {@link Pbkdf}
      * @param iterations   the number of iterations used for PBKDF modes
      */
+    @SuppressWarnings("WeakerAccess")
     public AliceContext(Algorithm algorithm, Mode mode, Padding padding, KeyLength keyLength, MacAlgorithm macAlgorithm, Pbkdf pbkdf, int iterations) {
         this.algorithm = algorithm;
         this.mode = mode;
@@ -36,30 +37,37 @@ public class AliceContext {
         this.iterations = iterations;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Algorithm getAlgorithm() {
         return algorithm;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Mode getMode() {
         return mode;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Padding getPadding() {
         return padding;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public KeyLength getKeyLength() {
         return keyLength;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public MacAlgorithm getMacAlgorithm() {
         return macAlgorithm;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Pbkdf getPbkdf() {
         return pbkdf;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public int getIterations() {
         return iterations;
     }
@@ -73,7 +81,12 @@ public class AliceContext {
          * FIPS 197</a>. Also known as the Rijndael algorithm by Joan Daemen and Vincent Rijmen, AES is a 128-bit block
          * cipher supporting keys of 128, 192, and 256 bits.
          */
-        AES("AES");
+        AES("AES"),
+        /**
+         * The Digital Encryption Standard as described in
+         * <a href="http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf">FIPS PUB 46-3</a>
+         */
+        DES("DES");
 
         private String value;
 
@@ -149,6 +162,7 @@ public class AliceContext {
      * Cipher key length
      */
     public enum KeyLength {
+        BITS_64(64),
         BITS_128(128),
         BITS_192(192),
         BITS_256(256);
