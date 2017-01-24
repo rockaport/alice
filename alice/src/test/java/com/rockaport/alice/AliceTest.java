@@ -90,8 +90,8 @@ public class AliceTest {
     }
 
     @Nested
-    @DisplayName("AES bytes")
-    class AesBytes {
+    @DisplayName("Bytes")
+    class Bytes {
         @Nested
         @DisplayName("Bad arguments")
         class BadArguments {
@@ -160,347 +160,449 @@ public class AliceTest {
         }
 
         @Nested
-        @DisplayName("CTR")
-        class Ctr {
+        @DisplayName("AES")
+        class Aes {
             @Nested
-            @DisplayName("NoPadding")
-            class NoPadding {
-                @Test
-                @DisplayName("128")
-                void aesCtrNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CTR")
+            class Ctr {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCtrNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesCtrNoPadding192(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCtrNoPadding256(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCtrNoPadding192(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCtrPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
 
-                @Test
-                @DisplayName("256")
-                void aesCtrNoPadding256(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                    @Test
+                    @DisplayName("192")
+                    void aesCtrPKCS5Padding192(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCtrPKCS5Padding256(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
             }
 
             @Nested
-            @DisplayName("PKCS5Padding")
-            class Pkcs5Padding {
-                @Test
-                @DisplayName("128")
-                void aesCtrPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CBC")
+            class Cbc {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCbcNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesCbcNoPadding192(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCbcNoPadding256(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCtrPKCS5Padding192(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCbcPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesCbcPKCS5Padding192(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCbcPKCS5Padding256(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+                }
+            }
+
+            @Nested
+            @DisplayName("GCM")
+            class Gcm {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCbcNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesGcmNoPadding192(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesGcmNoPadding256(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
 
-                @Test
-                @DisplayName("256")
-                void aesCtrPKCS5Padding256(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("128")
+                    void aesGcmPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesGcmPKCS5Padding192(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesGcmPKCS5Padding256(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
             }
         }
 
         @Nested
-        @DisplayName("CBC")
-        class Cbc {
+        @DisplayName("DES")
+        class Des {
             @Nested
-            @DisplayName("NoPadding")
-            class NoPadding {
-                @Test
-                @DisplayName("128")
-                void aesCbcNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CTR")
+            class Ctr {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("64")
+                    void desCtrNoPadding56(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCbcNoPadding192(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("64")
+                    void desCtrPKCS5Padding56(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesCbcNoPadding256(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
             }
 
             @Nested
-            @DisplayName("PKCS5Padding")
-            class Pkcs5Padding {
-                @Test
-                @DisplayName("128")
-                void aesCbcPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CBC")
+            class Cbc {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("64")
+                    void desCbcNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCbcPKCS5Padding192(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("64")
+                    void desCbcPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
+                        ByteString decryptedMessage = ByteString.of(
+                                alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
 
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesCbcPKCS5Padding256(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-            }
-        }
-
-        @Nested
-        @DisplayName("GCM")
-        class Gcm {
-            @Nested
-            @DisplayName("NoPadding")
-            class NoPadding {
-                @Test
-                @DisplayName("128")
-                void aesCbcNoPadding128(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-
-                @Test
-                @DisplayName("192")
-                void aesGcmNoPadding192(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesGcmNoPadding256(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-            }
-
-            @Nested
-            @DisplayName("PKCS5Padding")
-            class Pkcs5Padding {
-                @Test
-                @DisplayName("128")
-                void aesGcmPKCS5Padding128(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-
-                @Test
-                @DisplayName("192")
-                void aesGcmPKCS5Padding192(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesGcmPKCS5Padding256(TestInfo testInfo) throws GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    ByteString decryptedMessage = ByteString.of(
-                            alice.decrypt(alice.encrypt(message.toByteArray(), password), password));
-
-                    assertEquals(message.utf8(), decryptedMessage.utf8());
+                        assertEquals(message.utf8(), decryptedMessage.utf8());
+                    }
                 }
             }
         }
     }
+
+
 
     @Nested
     @DisplayName("Key derivation")
@@ -644,8 +746,8 @@ public class AliceTest {
     }
 
     @Nested
-    @DisplayName("AES file")
-    class AesFile {
+    @DisplayName("File")
+    class FileEnc {
         @Nested
         @DisplayName("Bad arguments")
         class BadArguments {
@@ -718,361 +820,464 @@ public class AliceTest {
         }
 
         @Nested
-        @DisplayName("CTR")
-        class Ctr {
+        @DisplayName("AES")
+        class Aes {
             @Nested
-            @DisplayName("NoPadding")
-            class NoPadding {
-                @Test
-                @DisplayName("128")
-                void aesCtrNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CTR")
+            class Ctr {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCtrNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesCtrNoPadding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCtrNoPadding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCtrNoPadding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCtrPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
 
-                @Test
-                @DisplayName("256")
-                void aesCtrNoPadding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                    @Test
+                    @DisplayName("192")
+                    void aesCtrPKCS5Padding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCtrPKCS5Padding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
             }
 
             @Nested
-            @DisplayName("PKCS5Padding")
-            class Pkcs5Padding {
-                @Test
-                @DisplayName("128")
-                void aesCtrPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CBC")
+            class Cbc {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCbcNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesCbcNoPadding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCbcNoPadding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCtrPKCS5Padding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCbcPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesCbcPKCS5Padding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesCbcPKCS5Padding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+                }
+            }
+
+            @Nested
+            @DisplayName("GCM")
+            class Gcm {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("128")
+                    void aesCbcNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesGcmNoPadding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesGcmNoPadding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
 
-                @Test
-                @DisplayName("256")
-                void aesCtrPKCS5Padding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CTR)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("128")
+                    void aesGcmPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_128)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("192")
+                    void aesGcmPKCS5Padding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_192)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
+
+                    @Test
+                    @DisplayName("256")
+                    void aesGcmPKCS5Padding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.AES)
+                                .setMode(AliceContext.Mode.GCM)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_256)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
+
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
             }
         }
 
         @Nested
-        @DisplayName("CBC")
-        class Cbc {
+        @DisplayName("DES")
+        class Des {
             @Nested
-            @DisplayName("NoPadding")
-            class NoPadding {
-                @Test
-                @DisplayName("128")
-                void aesCbcNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CTR")
+            class Ctr {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("64")
+                    void desCtrNoPadding56(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCbcNoPadding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("64")
+                    void desCtrPKCS5Padding56(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CTR)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesCbcNoPadding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
             }
 
             @Nested
-            @DisplayName("PKCS5Padding")
-            class Pkcs5Padding {
-                @Test
-                @DisplayName("128")
-                void aesCbcPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+            @DisplayName("CBC")
+            class Cbc {
+                @Nested
+                @DisplayName("NoPadding")
+                class NoPadding {
+                    @Test
+                    @DisplayName("64")
+                    void desCbcNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.NO_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
 
-                @Test
-                @DisplayName("192")
-                void aesCbcPKCS5Padding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
+                @Nested
+                @DisplayName("PKCS5Padding")
+                class Pkcs5Padding {
+                    @Test
+                    @DisplayName("64")
+                    void desCbcPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
+                        Alice alice = new Alice(new AliceContextBuilder()
+                                .setAlgorithm(AliceContext.Algorithm.DES)
+                                .setMode(AliceContext.Mode.CBC)
+                                .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                                .setKeyLength(AliceContext.KeyLength.BITS_64)
+                                .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                                .build());
 
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
+                        alice.encrypt(originalFile, encryptedFile, password);
+                        alice.decrypt(encryptedFile, decryptedFile, password);
 
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesCbcPKCS5Padding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.CBC)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-            }
-        }
-
-        @Nested
-        @DisplayName("GCM")
-        class Gcm {
-            @Nested
-            @DisplayName("NoPadding")
-            class NoPadding {
-                @Test
-                @DisplayName("128")
-                void aesCbcNoPadding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-
-                @Test
-                @DisplayName("192")
-                void aesGcmNoPadding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesGcmNoPadding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.NO_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-            }
-
-            @Nested
-            @DisplayName("PKCS5Padding")
-            class Pkcs5Padding {
-                @Test
-                @DisplayName("128")
-                void aesGcmPKCS5Padding128(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_128)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-
-                @Test
-                @DisplayName("192")
-                void aesGcmPKCS5Padding192(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_192)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
-                }
-
-                @Test
-                @DisplayName("256")
-                void aesGcmPKCS5Padding256(TestInfo testInfo) throws IOException, GeneralSecurityException {
-                    Alice alice = new Alice(new AliceContextBuilder()
-                            .setAlgorithm(AliceContext.Algorithm.AES)
-                            .setMode(AliceContext.Mode.GCM)
-                            .setPadding(AliceContext.Padding.PKCS5_PADDING)
-                            .setKeyLength(AliceContext.KeyLength.BITS_256)
-                            .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
-                            .build());
-
-                    alice.encrypt(originalFile, encryptedFile, password);
-                    alice.decrypt(encryptedFile, decryptedFile, password);
-
-                    assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
-                            FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                        assertEquals(FileUtils.readFileToString(originalFile, StandardCharsets.UTF_8),
+                                FileUtils.readFileToString(decryptedFile, StandardCharsets.UTF_8));
+                    }
                 }
             }
         }
@@ -1263,38 +1468,54 @@ public class AliceTest {
     }
 
     @Nested
-    @DisplayName("AES Key generator")
+    @DisplayName("Key generator")
     class KeyGenerator {
-        @Test
-        @DisplayName("128")
-        void generateKey128(TestInfo testInfo) throws GeneralSecurityException {
-            byte[] key = Alice.generateKey(AliceContext.KeyLength.BITS_128);
-
-            assertEquals(key.length, AliceContext.KeyLength.BITS_128.bytes());
-        }
-
-        @Test
-        @DisplayName("192")
-        void generateKey192(TestInfo testInfo) throws GeneralSecurityException {
-            byte[] key = Alice.generateKey(AliceContext.KeyLength.BITS_192);
-
-            assertEquals(key.length, AliceContext.KeyLength.BITS_192.bytes());
-        }
-
-        @Test
-        @DisplayName("256")
-        void generateKey256(TestInfo testInfo) throws GeneralSecurityException {
-            byte[] key = Alice.generateKey(AliceContext.KeyLength.BITS_256);
-
-            assertEquals(key.length, AliceContext.KeyLength.BITS_256.bytes());
-        }
-
         @SuppressWarnings("ConstantConditions")
         @Test
         @DisplayName("Null key")
         void nullKey(TestInfo testInfo) {
             assertThrows(IllegalArgumentException.class,
-                    () -> Alice.generateKey(null));
+                    () -> Alice.generateKey(null, null));
+        }
+
+        @Nested
+        @DisplayName("AES")
+        class Aes {
+            @Test
+            @DisplayName("128")
+            void generateKey128(TestInfo testInfo) throws GeneralSecurityException {
+                byte[] key = Alice.generateKey(AliceContext.Algorithm.AES, AliceContext.KeyLength.BITS_128);
+
+                assertEquals(key.length, AliceContext.KeyLength.BITS_128.bytes());
+            }
+
+            @Test
+            @DisplayName("192")
+            void generateKey192(TestInfo testInfo) throws GeneralSecurityException {
+                byte[] key = Alice.generateKey(AliceContext.Algorithm.AES, AliceContext.KeyLength.BITS_192);
+
+                assertEquals(key.length, AliceContext.KeyLength.BITS_192.bytes());
+            }
+
+            @Test
+            @DisplayName("256")
+            void generateKey256(TestInfo testInfo) throws GeneralSecurityException {
+                byte[] key = Alice.generateKey(AliceContext.Algorithm.AES, AliceContext.KeyLength.BITS_256);
+
+                assertEquals(key.length, AliceContext.KeyLength.BITS_256.bytes());
+            }
+        }
+
+        @Nested
+        @DisplayName("DES")
+        class Des {
+            @Test
+            @DisplayName("64")
+            void generateKey128(TestInfo testInfo) throws GeneralSecurityException {
+                byte[] key = Alice.generateKey(AliceContext.Algorithm.DES, AliceContext.KeyLength.BITS_64);
+
+                assertEquals(key.length, AliceContext.KeyLength.BITS_64.bytes());
+            }
         }
     }
 }

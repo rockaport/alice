@@ -18,10 +18,10 @@ import java.util.Arrays;
  * The main Alice API for encryption and decryption of byte arrays and files.
  */
 public class Alice {
-    private static final int IV_LENGTH = 16;
     private final AliceContext context;
     private final Cipher cipher;
     private final SecureRandom secureRandom = new SecureRandom();
+    private int IV_LENGTH;
 
     /**
      * Initializes a new {@code Alice} object for encryption and decryption. See {@link com.rockaport.alice.AliceContext}
@@ -41,6 +41,15 @@ public class Alice {
 
         this.context = context;
 
+        switch (context.getAlgorithm()) {
+            case AES:
+                IV_LENGTH = 16;
+                break;
+            case DES:
+                IV_LENGTH = 8;
+                break;
+        }
+
         try {
             cipher = Cipher.getInstance(context.getAlgorithm() + "/" + context.getMode() + "/" + context.getPadding());
         } catch (GeneralSecurityException e) {
@@ -56,14 +65,19 @@ public class Alice {
      * @throws GeneralSecurityException if either initialization or generation fails
      */
     @SuppressWarnings("WeakerAccess")
-    public static byte[] generateKey(AliceContext.KeyLength keyLength) throws GeneralSecurityException {
-        if (keyLength == null) {
-            throw new IllegalArgumentException("KeyLength is null");
+    public static byte[] generateKey(AliceContext.Algorithm algorithm, AliceContext.KeyLength keyLength) throws GeneralSecurityException {
+        if (algorithm == null || keyLength == null) {
+            throw new IllegalArgumentException("Algorithm or keyLength is null");
         }
 
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(AliceContext.Algorithm.AES.toString());
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.toString());
 
-        keyGenerator.init(keyLength.bits());
+        int actualKeyLength = keyLength.bits();
+        if (keyLength == AliceContext.KeyLength.BITS_64) {
+            actualKeyLength -= 8;
+        }
+
+        keyGenerator.init(actualKeyLength);
 
         return keyGenerator.generateKey().getEncoded();
     }
@@ -425,7 +439,7 @@ public class Alice {
                 break;
         }
 
-        return new SecretKeySpec(key, "AES");
+        return new SecretKeySpec(key, context.getAlgorithm().toString());
     }
 
     private AlgorithmParameterSpec getAlgorithmParameterSpec(AliceContext.Mode mode, byte[] initializationVector) {
