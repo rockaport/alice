@@ -20,12 +20,11 @@ import java.util.Arrays;
 public class Alice {
     private final AliceContext context;
     private final Cipher cipher;
-    private final SecureRandom secureRandom = new SecureRandom();
-    private int IV_LENGTH;
+    private final int ivLength;
 
     /**
-     * Initializes a new {@code Alice} object for encryption and decryption. See {@link com.rockaport.alice.AliceContext}
-     * for an explanation of options.
+     * Initializes a new {@code Alice} object for encryption and decryption. See
+     * {@link com.rockaport.alice.AliceContext} for an explanation of options.
      *
      * @param context an {@link com.rockaport.alice.AliceContext}
      */
@@ -43,11 +42,13 @@ public class Alice {
 
         switch (context.getAlgorithm()) {
             case AES:
-                IV_LENGTH = 16;
+                ivLength = 16;
                 break;
             case DES:
-                IV_LENGTH = 8;
+                ivLength = 8;
                 break;
+            default:
+                throw new IllegalArgumentException("Unsupported algorithm");
         }
 
         try {
@@ -60,12 +61,14 @@ public class Alice {
     /**
      * Generates an AES key
      *
+     * @param algorithm the key will be used with
      * @param keyLength length of key
      * @return a byte array
      * @throws GeneralSecurityException if either initialization or generation fails
      */
     @SuppressWarnings("WeakerAccess")
-    public static byte[] generateKey(AliceContext.Algorithm algorithm, AliceContext.KeyLength keyLength) throws GeneralSecurityException {
+    public static byte[] generateKey(AliceContext.Algorithm algorithm, AliceContext.KeyLength keyLength)
+            throws GeneralSecurityException {
         if (algorithm == null || keyLength == null) {
             throw new IllegalArgumentException("Algorithm or keyLength is null");
         }
@@ -172,7 +175,8 @@ public class Alice {
      * @throws IOException              if there's a failure to read/write from/to the input/output file
      */
     @SuppressWarnings("WeakerAccess")
-    public synchronized void encrypt(File input, File output, char[] password) throws GeneralSecurityException, IOException {
+    public synchronized void encrypt(File input, File output, char[] password)
+            throws GeneralSecurityException, IOException {
         if (input == null || !input.exists() || input.length() <= 0) {
             throw new IllegalArgumentException("Input file is either null or does not exist");
         }
@@ -259,17 +263,17 @@ public class Alice {
         }
 
         // deconstruct the input
-        byte[] initializationVector = Arrays.copyOfRange(input, 0, IV_LENGTH);
+        byte[] initializationVector = Arrays.copyOfRange(input, 0, ivLength);
 
         byte[] cipherText;
 
         // extract the MAC if needed
         if (context.getMacAlgorithm() == AliceContext.MacAlgorithm.NONE) {
-            cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length);
+            cipherText = Arrays.copyOfRange(input, ivLength, input.length);
         } else {
             Mac mac = getMac(context.getMacAlgorithm(), password);
 
-            cipherText = Arrays.copyOfRange(input, IV_LENGTH, input.length - mac.getMacLength());
+            cipherText = Arrays.copyOfRange(input, ivLength, input.length - mac.getMacLength());
             byte[] recMac = Arrays.copyOfRange(input, input.length - mac.getMacLength(), input.length);
 
             // compute the mac
@@ -299,7 +303,8 @@ public class Alice {
      * @throws IOException              if there's a failure to read/write from/to the input/output file
      */
     @SuppressWarnings("WeakerAccess")
-    public synchronized void decrypt(File input, File output, char[] password) throws GeneralSecurityException, IOException {
+    public synchronized void decrypt(File input, File output, char[] password)
+            throws GeneralSecurityException, IOException {
         if (input == null || !input.exists() || input.length() <= 0) {
             throw new IllegalArgumentException("Input file is either null or does not exist");
         }
@@ -330,11 +335,11 @@ public class Alice {
             bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
 
             // read the initialization vector
-            byte[] initializationVector = new byte[IV_LENGTH];
+            byte[] initializationVector = new byte[ivLength];
 
             int ivBytesRead = bufferedInputStream.read(initializationVector);
 
-            if (ivBytesRead < IV_LENGTH) {
+            if (ivBytesRead < ivLength) {
                 throw new IOException("File doesn't contain an IV");
             }
 
@@ -347,7 +352,7 @@ public class Alice {
             int bytesRead;
             int numBytesToProcess;
             byte[] inputStreamBuffer = new byte[4096];
-            long bytesLeft = input.length() - IV_LENGTH;
+            long bytesLeft = input.length() - ivLength;
 
             // subtract the mac length if enabled
             if (mac != null) {
@@ -423,7 +428,8 @@ public class Alice {
             case SHA_512:
                 key = new byte[context.getKeyLength().bytes()];
 
-                byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString()).digest(toBytes(password));
+                byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString())
+                        .digest(toBytes(password));
 
                 System.arraycopy(hashedPassword, 0,
                         key, 0,
@@ -434,7 +440,12 @@ public class Alice {
             case PBKDF_2_WITH_HMAC_SHA_384:
             case PBKDF_2_WITH_HMAC_SHA_512:
                 key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
-                        .generateSecret(new PBEKeySpec(password, initializationVector, context.getIterations(), context.getKeyLength().bits()))
+                        .generateSecret(
+                                new PBEKeySpec(
+                                        password,
+                                        initializationVector,
+                                        context.getIterations(),
+                                        context.getKeyLength().bits()))
                         .getEncoded();
                 break;
         }
@@ -452,7 +463,7 @@ public class Alice {
             case CTR:
                 return new IvParameterSpec(initializationVector);
             case GCM:
-                return new GCMParameterSpec(IV_LENGTH << 3, initializationVector);
+                return new GCMParameterSpec(ivLength << 3, initializationVector);
         }
 
         throw new IllegalArgumentException("Unknown mode");
@@ -464,9 +475,9 @@ public class Alice {
      * @return a byte array
      */
     private byte[] generateInitializationVector() {
-        byte[] initializationVector = new byte[IV_LENGTH];
+        byte[] initializationVector = new byte[ivLength];
 
-        secureRandom.nextBytes(initializationVector);
+        new SecureRandom().nextBytes(initializationVector);
 
         return initializationVector;
     }
