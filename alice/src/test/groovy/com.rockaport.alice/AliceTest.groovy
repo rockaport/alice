@@ -228,11 +228,11 @@ class AliceTest extends Specification {
         when:
         def success = true
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -287,11 +287,11 @@ class AliceTest extends Specification {
         when:
         def success = true
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -346,11 +346,11 @@ class AliceTest extends Specification {
         when:
         def failures = 0
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -411,11 +411,11 @@ class AliceTest extends Specification {
         when:
         def failures = 0
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -472,11 +472,11 @@ class AliceTest extends Specification {
         when:
         def success = true
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -527,11 +527,11 @@ class AliceTest extends Specification {
         when:
         def success = true
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -582,11 +582,11 @@ class AliceTest extends Specification {
         when:
         def failures = 0
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
@@ -643,11 +643,11 @@ class AliceTest extends Specification {
         when:
         def failures = 0
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = ((int) i / (modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % algorithms.length
-            int midx = ((int) i / (paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length)) % modes.length
-            int pidx = ((int) i / (keyLengths.length * pbkdfs.length * macAlgorithms.length)) % paddings.length
-            int kidx = ((int) i / (pbkdfs.length * macAlgorithms.length)) % keyLengths.length
-            int bidx = ((int) i / (macAlgorithms.length)) % pbkdfs.length
+            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
