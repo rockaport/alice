@@ -9,8 +9,8 @@ public class AliceContext {
     private Mode mode;
     private Padding padding;
     private KeyLength keyLength;
-    private MacAlgorithm macAlgorithm;
     private Pbkdf pbkdf;
+    private MacAlgorithm macAlgorithm;
     private int iterations;
 
     /**
@@ -22,18 +22,18 @@ public class AliceContext {
      * @param mode         the {@link Mode}
      * @param padding      the {@link Padding}
      * @param keyLength    the {@link KeyLength}
-     * @param macAlgorithm the {@link MacAlgorithm}
      * @param pbkdf        the {@link Pbkdf}
+     * @param macAlgorithm the {@link MacAlgorithm}
      * @param iterations   the number of iterations used for PBKDF modes
      */
     @SuppressWarnings("WeakerAccess")
-    public AliceContext(Algorithm algorithm, Mode mode, Padding padding, KeyLength keyLength, MacAlgorithm macAlgorithm, Pbkdf pbkdf, int iterations) {
+    public AliceContext(Algorithm algorithm, Mode mode, Padding padding, KeyLength keyLength, Pbkdf pbkdf, MacAlgorithm macAlgorithm, int iterations) {
         this.algorithm = algorithm;
         this.mode = mode;
         this.padding = padding;
         this.keyLength = keyLength;
-        this.macAlgorithm = macAlgorithm;
         this.pbkdf = pbkdf;
+        this.macAlgorithm = macAlgorithm;
         this.iterations = iterations;
     }
 
@@ -58,13 +58,13 @@ public class AliceContext {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public MacAlgorithm getMacAlgorithm() {
-        return macAlgorithm;
+    public Pbkdf getPbkdf() {
+        return pbkdf;
     }
 
     @SuppressWarnings("WeakerAccess")
-    public Pbkdf getPbkdf() {
-        return pbkdf;
+    public MacAlgorithm getMacAlgorithm() {
+        return macAlgorithm;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -183,34 +183,6 @@ public class AliceContext {
     }
 
     /**
-     * Supported Messsage Authentication Algorithms (MAC).
-     * The HmacSHA* algorithms as defined in <a href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a> "HMAC:
-     * Keyed-Hashing for Message Authentication" (February 1997) with SHA-* as the message digest algorithm.
-     */
-    public enum MacAlgorithm {
-        NONE,
-        HMAC_SHA_1("HmacSHA1"),
-        HMAC_SHA_256("HmacSHA256"),
-        HMAC_SHA_384("HmacSHA384"),
-        HMAC_SHA_512("HmacSHA512");
-
-        private final String value;
-
-        MacAlgorithm() {
-            this("");
-        }
-
-        MacAlgorithm(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
-    /**
      * Supported Password Based Key Derivation Function (PBKDF) algorithms.
      */
     public enum Pbkdf {
@@ -266,6 +238,30 @@ public class AliceContext {
         }
 
         Pbkdf(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+
+    /**
+     * Supported Messsage Authentication Algorithms (MAC).
+     * The HmacSHA* algorithms as defined in <a href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a> "HMAC:
+     * Keyed-Hashing for Message Authentication" (February 1997) with SHA-* as the message digest algorithm.
+     */
+    public enum MacAlgorithm {
+        NONE("None"),
+        HMAC_SHA_1("HmacSHA1"),
+        HMAC_SHA_256("HmacSHA256"),
+        HMAC_SHA_384("HmacSHA384"),
+        HMAC_SHA_512("HmacSHA512");
+
+        private final String value;
+
+        MacAlgorithm(String value) {
             this.value = value;
         }
 

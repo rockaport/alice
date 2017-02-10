@@ -8,8 +8,8 @@ public class AliceContextBuilder {
     private AliceContext.Mode mode = AliceContext.Mode.CTR;
     private AliceContext.Padding padding = AliceContext.Padding.NO_PADDING;
     private AliceContext.KeyLength keyLength = AliceContext.KeyLength.BITS_256;
-    private AliceContext.MacAlgorithm macAlgorithm = AliceContext.MacAlgorithm.HMAC_SHA_512;
     private AliceContext.Pbkdf pbkdf = AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_512;
+    private AliceContext.MacAlgorithm macAlgorithm = AliceContext.MacAlgorithm.HMAC_SHA_512;
     private int iterations = 10000;
 
     /**
@@ -57,17 +57,6 @@ public class AliceContextBuilder {
     }
 
     /**
-     * Sets the MAC algorithm. Defaults to {@code HmacSHA512}
-     *
-     * @param macAlgorithm the {@link com.rockaport.alice.AliceContext.MacAlgorithm}
-     * @return {@link com.rockaport.alice.AliceContextBuilder}
-     */
-    public AliceContextBuilder setMacAlgorithm(AliceContext.MacAlgorithm macAlgorithm) {
-        this.macAlgorithm = macAlgorithm;
-        return this;
-    }
-
-    /**
      * Sets the Pbkdf algorithm. Defaults to {@code PBKDF2WithHmacSHA512}
      *
      * @param pbkdf the {@link com.rockaport.alice.AliceContext.Pbkdf}
@@ -75,6 +64,17 @@ public class AliceContextBuilder {
      */
     public AliceContextBuilder setPbkdf(AliceContext.Pbkdf pbkdf) {
         this.pbkdf = pbkdf;
+        return this;
+    }
+
+    /**
+     * Sets the MAC algorithm. Defaults to {@code HmacSHA512}
+     *
+     * @param macAlgorithm the {@link com.rockaport.alice.AliceContext.MacAlgorithm}
+     * @return {@link com.rockaport.alice.AliceContextBuilder}
+     */
+    public AliceContextBuilder setMacAlgorithm(AliceContext.MacAlgorithm macAlgorithm) {
+        this.macAlgorithm = macAlgorithm;
         return this;
     }
 
@@ -95,6 +95,6 @@ public class AliceContextBuilder {
      * @return {@link com.rockaport.alice.AliceContext}
      */
     public AliceContext build() {
-        return new AliceContext(algorithm, mode, padding, keyLength, macAlgorithm, pbkdf, iterations);
+        return new AliceContext(algorithm, mode, padding, keyLength, pbkdf, macAlgorithm, iterations);
     }
 }
