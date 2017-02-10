@@ -63,8 +63,7 @@ class AliceTest extends Specification {
 
     def "Byte decryption throws with invalid inputs"() {
         when:
-        Alice alice = new Alice(new AliceContextBuilder().build())
-        alice.decrypt(inputBytes as byte[], inputPassword as char[])
+        new Alice(new AliceContextBuilder().build()).decrypt(inputBytes as byte[], inputPassword as char[])
 
         then:
         thrown(expectedException)
@@ -158,11 +157,7 @@ class AliceTest extends Specification {
 
     def "Invalid iterations throws exception"() {
         when:
-        Alice alice = new Alice(new AliceContextBuilder()
-                .setIterations(iterations)
-                .build())
-
-        alice.encrypt(plainText, password)
+        new Alice(new AliceContextBuilder().setIterations(iterations).build()).encrypt(plainText, password)
 
         then:
         thrown(expectedException)
@@ -293,6 +288,8 @@ class AliceTest extends Specification {
             int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
             int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
+
+            println("${algorithms[aidx]}-${modes[midx]}-${paddings[pidx]}-${keyLengths[kidx]}-${pbkdfs[bidx]}-${macAlgorithms[midx]}")
 
             Alice alice = new Alice(new AliceContextBuilder()
                     .setAlgorithm(algorithms[aidx])
