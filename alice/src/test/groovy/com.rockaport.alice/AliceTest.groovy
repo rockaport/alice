@@ -289,8 +289,6 @@ class AliceTest extends Specification {
             int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
             int cidx = i % macAlgorithms.length
 
-            println("${algorithms[aidx]}-${modes[midx]}-${paddings[pidx]}-${keyLengths[kidx]}-${pbkdfs[bidx]}-${macAlgorithms[midx]}")
-
             Alice alice = new Alice(new AliceContextBuilder()
                     .setAlgorithm(algorithms[aidx])
                     .setMode(modes[midx])
