@@ -53,12 +53,16 @@ class AliceTest extends Specification {
 
         where:
         inputBytes  | inputPassword || expectedException
+        null        | null          || IllegalArgumentException
+        null        | new char[0]   || IllegalArgumentException
+        null        | new char[1]   || IllegalArgumentException
+
+        new byte[0] | null          || IllegalArgumentException
         new byte[0] | new char[0]   || IllegalArgumentException
         new byte[0] | new char[1]   || IllegalArgumentException
+
+        new byte[1] | null          || IllegalArgumentException
         new byte[1] | new char[0]   || IllegalArgumentException
-        new byte[0] | null          || IllegalArgumentException
-        null        | new char[0]   || IllegalArgumentException
-        null        | null          || IllegalArgumentException
     }
 
     def "Byte decryption throws with invalid inputs"() {
@@ -70,12 +74,16 @@ class AliceTest extends Specification {
 
         where:
         inputBytes  | inputPassword || expectedException
+        null        | null          || IllegalArgumentException
+        null        | new char[0]   || IllegalArgumentException
+        null        | new char[1]   || IllegalArgumentException
+
+        new byte[0] | null          || IllegalArgumentException
         new byte[0] | new char[0]   || IllegalArgumentException
         new byte[0] | new char[1]   || IllegalArgumentException
+
+        new byte[1] | null          || IllegalArgumentException
         new byte[1] | new char[0]   || IllegalArgumentException
-        new byte[0] | null          || IllegalArgumentException
-        null        | new char[0]   || IllegalArgumentException
-        null        | null          || IllegalArgumentException
     }
 
     def "File encryption throws with invalid inputs"() {
