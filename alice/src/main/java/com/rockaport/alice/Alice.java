@@ -335,6 +335,10 @@ public class Alice {
 
                 RandomAccessFile randomAccessFile = new RandomAccessFile(input, "r");
 
+                if (randomAccessFile.length() - mac.getMacLength() <= 0) {
+                    throw new IOException("File oes not contain sufficient data for decryption");
+                }
+
                 randomAccessFile.seek(randomAccessFile.length() - mac.getMacLength());
                 randomAccessFile.read(recMac);
 
@@ -373,6 +377,10 @@ public class Alice {
             // decrypt
             while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
                 numBytesToProcess = (bytesRead < bytesLeft) ? bytesRead : (int) bytesLeft;
+
+                if (numBytesToProcess <= 0) {
+                    break;
+                }
 
                 bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, numBytesToProcess));
 

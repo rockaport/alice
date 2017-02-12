@@ -189,7 +189,7 @@ public class AliceContext {
         /**
          * Use password as is.
          */
-        NONE,
+        NONE("None"),
         /**
          * SHA-1 hash the password
          */
@@ -232,10 +232,6 @@ public class AliceContext {
         PBKDF_2_WITH_HMAC_SHA_512("PBKDF2WithHmacSHA512");
 
         private final String value;
-
-        Pbkdf() {
-            this("");
-        }
 
         Pbkdf(String value) {
             this.value = value;

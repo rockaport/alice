@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
 
-version = '0.3'
+version = '0.5'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -12,10 +12,11 @@ dependencies {
 
     compile "org.codehaus.groovy:groovy-all:2.4.1"
 
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-3'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.5'
+    testCompile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.0-M3'
     testRuntime group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '4.12.0-M3'
-    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-1'
-    testCompile group: 'commons-io', name: 'commons-io', version: '2.5'
 }
 
 task copyDocs(dependsOn: 'javadoc', type: Copy) {

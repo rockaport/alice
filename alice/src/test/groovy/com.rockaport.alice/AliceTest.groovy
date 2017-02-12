@@ -2,6 +2,7 @@ package com.rockaport.alice
 
 import com.rockaport.alice.AliceContext
 import org.apache.commons.io.FileUtils
+import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -11,7 +12,7 @@ class AliceTest extends Specification {
     @Shared
             badPassword = "badPassword".chars
     @Shared
-            plainText = "Some message to ".bytes
+            plainText = RandomStringUtils.randomAscii(16 * 1024).bytes
     @Shared
             inputFileName = "input.dat"
     @Shared
@@ -113,10 +114,31 @@ class AliceTest extends Specification {
         null                          | null                        | null          || IllegalArgumentException
         null                          | null                        | new char[0]   || IllegalArgumentException
         null                          | null                        | new char[1]   || IllegalArgumentException
+
+        null                          | new File(encryptedFileName) | null          || IllegalArgumentException
+        null                          | new File(encryptedFileName) | new char[0]   || IllegalArgumentException
         null                          | new File(encryptedFileName) | new char[1]   || IllegalArgumentException
+
+        new File(nonExistentFileName) | null                        | null          || IllegalArgumentException
+        new File(nonExistentFileName) | null                        | new char[0]   || IllegalArgumentException
+        new File(nonExistentFileName) | null                        | new char[1]   || IllegalArgumentException
+
+        new File(nonExistentFileName) | new File(encryptedFileName) | null          || IllegalArgumentException
+        new File(nonExistentFileName) | new File(encryptedFileName) | new char[0]   || IllegalArgumentException
         new File(nonExistentFileName) | new File(encryptedFileName) | new char[1]   || IllegalArgumentException
+
+        new File(emptyFileName)       | null                        | null          || IllegalArgumentException
+        new File(emptyFileName)       | null                        | new char[0]   || IllegalArgumentException
+        new File(emptyFileName)       | null                        | new char[1]   || IllegalArgumentException
+
+        new File(emptyFileName)       | new File(encryptedFileName) | null          || IllegalArgumentException
+        new File(emptyFileName)       | new File(encryptedFileName) | new char[0]   || IllegalArgumentException
         new File(emptyFileName)       | new File(encryptedFileName) | new char[1]   || IllegalArgumentException
+
         new File(inputFileName)       | null                        | null          || IllegalArgumentException
+        new File(inputFileName)       | null                        | new char[0]   || IllegalArgumentException
+        new File(inputFileName)       | null                        | new char[1]   || IllegalArgumentException
+
         new File(inputFileName)       | new File(encryptedFileName) | null          || IllegalArgumentException
         new File(inputFileName)       | new File(encryptedFileName) | new char[0]   || IllegalArgumentException
     }
@@ -154,13 +176,41 @@ class AliceTest extends Specification {
         null                          | null                        | null          || IllegalArgumentException
         null                          | null                        | new char[0]   || IllegalArgumentException
         null                          | null                        | new char[1]   || IllegalArgumentException
+
+        null                          | new File(decryptedFileName) | null          || IllegalArgumentException
+        null                          | new File(decryptedFileName) | new char[0]   || IllegalArgumentException
         null                          | new File(decryptedFileName) | new char[1]   || IllegalArgumentException
+
+        new File(nonExistentFileName) | null                        | null          || IllegalArgumentException
+        new File(nonExistentFileName) | null                        | new char[0]   || IllegalArgumentException
+        new File(nonExistentFileName) | null                        | new char[1]   || IllegalArgumentException
+
+        new File(nonExistentFileName) | new File(decryptedFileName) | null          || IllegalArgumentException
+        new File(nonExistentFileName) | new File(decryptedFileName) | new char[0]   || IllegalArgumentException
         new File(nonExistentFileName) | new File(decryptedFileName) | new char[1]   || IllegalArgumentException
+
+        new File(emptyFileName)       | null                        | null          || IllegalArgumentException
+        new File(emptyFileName)       | null                        | new char[0]   || IllegalArgumentException
+        new File(emptyFileName)       | null                        | new char[1]   || IllegalArgumentException
+
+        new File(emptyFileName)       | new File(decryptedFileName) | null          || IllegalArgumentException
+        new File(emptyFileName)       | new File(decryptedFileName) | new char[0]   || IllegalArgumentException
         new File(emptyFileName)       | new File(decryptedFileName) | new char[1]   || IllegalArgumentException
+
+        new File(invalidFileName)     | null                        | null          || IllegalArgumentException
+        new File(invalidFileName)     | null                        | new char[0]   || IllegalArgumentException
+        new File(invalidFileName)     | null                        | new char[1]   || IllegalArgumentException
+
+        new File(invalidFileName)     | new File(decryptedFileName) | null          || IllegalArgumentException
+        new File(invalidFileName)     | new File(decryptedFileName) | new char[0]   || IllegalArgumentException
+        new File(invalidFileName)     | new File(decryptedFileName) | new char[1]   || IOException
+
         new File(encryptedFileName)   | null                        | null          || IllegalArgumentException
+        new File(encryptedFileName)   | null                        | new char[0]   || IllegalArgumentException
+        new File(encryptedFileName)   | null                        | new char[1]   || IllegalArgumentException
+
         new File(encryptedFileName)   | new File(decryptedFileName) | null          || IllegalArgumentException
         new File(encryptedFileName)   | new File(decryptedFileName) | new char[0]   || IllegalArgumentException
-        new File(invalidFileName)     | new File(decryptedFileName) | new char[1]   || IOException
     }
 
     def "Invalid iterations throws exception"() {
