@@ -100,9 +100,9 @@ public class AliceContext {
      */
     public enum Algorithm {
         /**
-         * Advanced Encryption Standard as specified by NIST in
-         * <a href="http://csrc.nist.gov/publications/PubsFIPS.html">FIPS 197</a>. Also known as the Rijndael algorithm
-         * by Joan Daemen and Vincent Rijmen, AES is a 128-bit block cipher supporting keys of 128, 192, and 256 bits.
+         * Advanced Encryption Standard as specified by NIST in <a href="http://csrc.nist.gov/publications/PubsFIPS.html">
+         * FIPS 197</a>. Also known as the Rijndael algorithm by Joan Daemen and Vincent Rijmen, AES is a 128-bit block
+         * cipher supporting keys of 128, 192, and 256 bits.
          */
         AES("AES"),
         /**
@@ -128,19 +128,18 @@ public class AliceContext {
      */
     public enum Mode {
         /**
-         * Cipher Block Chaining Mode, as defined in <a href="http://csrc.nist.gov/publications/fips/fips81/fips81.htm">
-         * FIPS PUB 81</a>
+         * Cipher Block Chaining Mode, as defined in <a href="http://csrc.nist.gov/publications/fips/fips81/fips81.htm">FIPS PUB
+         * 81</a>
          */
         CBC("CBC"),
         /**
-         * Counter/CBC Mode, as defined in <a href="http://csrc.nist.gov/publications/nistpubs/800-38C/SP800-38C_updated
-         * -July20_2007.pdf">NIST Special Publication SP 800-38C</a>
+         * Counter/CBC Mode, as defined in <a href="http://csrc.nist.gov/publications/nistpubs/800-38C/SP800-38C_updated-July20_2007.pdf">
+         * NIST Special Publication SP 800-38C</a>
          */
         CTR("CTR"),
         /**
          * Galois/Counter Mode, as defined in
-         * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-
-         * 38D</a>.
+         * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>.
          */
         GCM("GCM");
 
@@ -165,9 +164,8 @@ public class AliceContext {
          */
         NO_PADDING("NoPadding"),
         /**
-         * The padding scheme described in <a href="http://www.emc.com/emc-plus/rsa-labs/standards-initiatives/pkcs-5-
-         * password-based-cryptography-standard.htm">RSA Laboratories, "PKCS #5: Password-Based Encryption Standard,"
-         * version 1.5, November 1993</a>
+         * The padding scheme described in <a href="http://www.emc.com/emc-plus/rsa-labs/standards-initiatives/pkcs-5-password-based-cryptography-standard.htm">
+         * RSA Laboratories, "PKCS #5: Password-Based Encryption Standard," version 1.5, November 1993</a>
          */
         PKCS5_PADDING("PKCS5Padding");
 
@@ -236,23 +234,23 @@ public class AliceContext {
          */
         SHA_512("SHA-512"),
         /**
-         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5
-         * 2.0</a> using the specified pseudo-random function
+         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5 2.0</a>
+         * using the specified pseudo-random function
          */
         PBKDF_2_WITH_HMAC_SHA_1("PBKDF2WithHmacSHA1"),
         /**
-         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5
-         * 2.0</a> using the specified pseudo-random function
+         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5 2.0</a>
+         * using the specified pseudo-random function
          */
         PBKDF_2_WITH_HMAC_SHA_256("PBKDF2WithHmacSHA256"),
         /**
-         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5
-         * 2.0</a> using the specified pseudo-random function
+         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5 2.0</a>
+         * using the specified pseudo-random function
          */
         PBKDF_2_WITH_HMAC_SHA_384("PBKDF2WithHmacSHA384"),
         /**
-         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5
-         * 2.0</a> using the specified pseudo-random function
+         * Password-based key-derivation algorithm found in <a href="http://www.rfc-editor.org/rfc/rfc2898.txt">PKCS #5 2.0</a>
+         * using the specified pseudo-random function
          */
         PBKDF_2_WITH_HMAC_SHA_512("PBKDF2WithHmacSHA512");
 
