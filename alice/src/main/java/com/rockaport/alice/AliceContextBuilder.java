@@ -10,6 +10,8 @@ public class AliceContextBuilder {
     private AliceContext.KeyLength keyLength = AliceContext.KeyLength.BITS_256;
     private AliceContext.Pbkdf pbkdf = AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_512;
     private AliceContext.MacAlgorithm macAlgorithm = AliceContext.MacAlgorithm.HMAC_SHA_512;
+    private int ivLength = 16;
+    private AliceContext.GcmTagLength gcmTagLength = AliceContext.GcmTagLength.BITS_128;
     private int iterations = 10000;
 
     /**
@@ -79,6 +81,29 @@ public class AliceContextBuilder {
     }
 
     /**
+     * Sets the initialization vector. Defaults to {@code 16}
+     * See {@link javax.crypto.spec.IvParameterSpec} or {@link javax.crypto.spec.GCMParameterSpec}
+     *
+     * @param ivLength the length of the initialization vector
+     * @return {@link com.rockaport.alice.AliceContextBuilder}
+     */
+    public AliceContextBuilder setIvLength(int ivLength) {
+        this.ivLength = ivLength;
+        return this;
+    }
+
+    /**
+     * Sets the GCM tag length. Defaults to {@code 128}
+     *
+     * @param gcmTagLength the tag length used for GCM modes of operation
+     * @return {@link com.rockaport.alice.AliceContextBuilder}
+     */
+    public AliceContextBuilder setGcmTagLength(AliceContext.GcmTagLength gcmTagLength) {
+        this.gcmTagLength = gcmTagLength;
+        return this;
+    }
+
+    /**
      * Sets the iterations for the Pbkdf algorithm. Defaults to {@code 10000}
      *
      * @param iterations the iterations used with the Pbkdf algorithm
@@ -95,6 +120,6 @@ public class AliceContextBuilder {
      * @return {@link com.rockaport.alice.AliceContext}
      */
     public AliceContext build() {
-        return new AliceContext(algorithm, mode, padding, keyLength, pbkdf, macAlgorithm, iterations);
+        return new AliceContext(algorithm, mode, padding, keyLength, pbkdf, macAlgorithm, ivLength, gcmTagLength, iterations);
     }
 }

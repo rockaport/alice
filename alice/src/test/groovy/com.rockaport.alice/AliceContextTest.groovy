@@ -76,4 +76,17 @@ class AliceContextTest extends Specification {
         "HMAC_SHA_384" || AliceContext.MacAlgorithm.HMAC_SHA_384
         "HMAC_SHA_512" || AliceContext.MacAlgorithm.HMAC_SHA_512
     }
+
+    def "GcmTagLength valueOf returns correct string"() {
+        expect:
+        AliceContext.GcmTagLength.valueOf(input) == output
+
+        where:
+        input      || output
+        "BITS_96"  || AliceContext.GcmTagLength.BITS_96
+        "BITS_104" || AliceContext.GcmTagLength.BITS_104
+        "BITS_112" || AliceContext.GcmTagLength.BITS_112
+        "BITS_120" || AliceContext.GcmTagLength.BITS_120
+        "BITS_128" || AliceContext.GcmTagLength.BITS_128
+    }
 }

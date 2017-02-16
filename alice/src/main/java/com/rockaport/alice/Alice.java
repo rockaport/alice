@@ -22,7 +22,6 @@ import java.util.Arrays;
 public class Alice {
     private final AliceContext context;
     private final Cipher cipher;
-    private final int ivLength;
 
     /**
      * Initializes a new {@code Alice} object for encryption and decryption. See
@@ -37,24 +36,54 @@ public class Alice {
                 context.getMode() == null ||
                 context.getPadding() == null ||
                 context.getKeyLength() == null ||
-                context.getMacAlgorithm() == null ||
-                context.getKeyLength() == null) {
+                context.getPbkdf() == null ||
+                context.getMacAlgorithm() == null) {
 
             throw new IllegalArgumentException("Context, algorithm, mode, or padding is null");
         }
 
-        this.context = context;
-
+        // Algorithm/mode specific validation
         switch (context.getAlgorithm()) {
             case AES:
-                ivLength = 16;
+                switch (context.getMode()) {
+                    case CBC:
+                    case CTR:
+                        if (context.getIvLength() != 16) {
+                            throw new IllegalArgumentException("CBC or CTR mode is selected but the IV length is not 16");
+                        }
+                        break;
+                    case GCM:
+                        if (context.getGcmTagLength() == null) {
+                            throw new IllegalArgumentException("GCM mode is selected but the tag length is null");
+                        }
+
+                        if (context.getIvLength() <= 0) {
+                            throw new IllegalArgumentException("GCM mode is selected but the IV length is invalid");
+                        }
+                        break;
+                }
                 break;
             case DES:
-                ivLength = 8;
+                if (context.getIvLength() != 8) {
+                    throw new IllegalArgumentException("DES algorithm is selected but the IV length is not 8 " +
+                            "(" + context.getIvLength() + ")");
+                }
                 break;
-            default:
-                throw new IllegalArgumentException("Unsupported algorithm");
         }
+
+        // PBKDF iterations validation
+        switch (context.getPbkdf()) {
+            case PBKDF_2_WITH_HMAC_SHA_1:
+            case PBKDF_2_WITH_HMAC_SHA_256:
+            case PBKDF_2_WITH_HMAC_SHA_384:
+            case PBKDF_2_WITH_HMAC_SHA_512:
+                if (context.getIterations() < 0) {
+                    throw new IllegalArgumentException("PBKDF is selected, but the number of iterations is invalid");
+                }
+                break;
+        }
+
+        this.context = context;
 
         try {
             cipher = Cipher.getInstance(context.getAlgorithm() + "/" + context.getMode() + "/" + context.getPadding());
@@ -266,17 +295,17 @@ public class Alice {
         }
 
         // deconstruct the input
-        byte[] initializationVector = Arrays.copyOfRange(input, 0, ivLength);
+        byte[] initializationVector = Arrays.copyOfRange(input, 0, context.getIvLength());
 
         byte[] cipherText;
 
         // extract the MAC if needed
         if (context.getMacAlgorithm() == AliceContext.MacAlgorithm.NONE) {
-            cipherText = Arrays.copyOfRange(input, ivLength, input.length);
+            cipherText = Arrays.copyOfRange(input, context.getIvLength(), input.length);
         } else {
             Mac mac = getMac(context.getMacAlgorithm(), password);
 
-            cipherText = Arrays.copyOfRange(input, ivLength, input.length - mac.getMacLength());
+            cipherText = Arrays.copyOfRange(input, context.getIvLength(), input.length - mac.getMacLength());
             byte[] recMac = Arrays.copyOfRange(input, input.length - mac.getMacLength(), input.length);
 
             // compute the mac
@@ -336,7 +365,7 @@ public class Alice {
                 RandomAccessFile randomAccessFile = new RandomAccessFile(input, "r");
 
                 if (randomAccessFile.length() - mac.getMacLength() <= 0) {
-                    throw new IOException("File oes not contain sufficient data for decryption");
+                    throw new IOException("File does not contain sufficient data for decryption");
                 }
 
                 randomAccessFile.seek(randomAccessFile.length() - mac.getMacLength());
@@ -350,11 +379,11 @@ public class Alice {
             bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
 
             // read the initialization vector
-            byte[] initializationVector = new byte[ivLength];
+            byte[] initializationVector = new byte[context.getIvLength()];
 
             int ivBytesRead = bufferedInputStream.read(initializationVector);
 
-            if (ivBytesRead < ivLength) {
+            if (ivBytesRead < context.getIvLength()) {
                 throw new IOException("File doesn't contain an IV");
             }
 
@@ -367,7 +396,7 @@ public class Alice {
             int bytesRead;
             int numBytesToProcess;
             byte[] inputStreamBuffer = new byte[4096];
-            long bytesLeft = input.length() - ivLength;
+            long bytesLeft = input.length() - context.getIvLength();
 
             // subtract the mac length if enabled
             if (mac != null) {
@@ -442,29 +471,29 @@ public class Alice {
     }
 
     private byte[] deriveKeyBytes(char[] password) {
-        byte[] key;
-        key = new byte[context.getKeyLength().bytes()];
+        byte[] key = new byte[context.getKeyLength().bytes()];
 
         System.arraycopy(toBytes(password), 0,
                 key, 0,
                 Math.min(context.getKeyLength().bytes(), password.length));
+
         return key;
     }
 
     private byte[] deriveShaKeyBytes(char[] password) throws NoSuchAlgorithmException {
-        byte[] key;
-        key = new byte[context.getKeyLength().bytes()];
-
         byte[] hashedPassword = MessageDigest.getInstance(context.getPbkdf().toString())
                 .digest(toBytes(password));
 
+        byte[] key = new byte[context.getKeyLength().bytes()];
         System.arraycopy(hashedPassword, 0,
                 key, 0,
                 Math.min(context.getKeyLength().bytes(), hashedPassword.length));
+
         return key;
     }
 
-    private byte[] derivePbkdfKeyBytes(char[] password, byte[] initializationVector) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    private byte[] derivePbkdfKeyBytes(char[] password, byte[] initializationVector)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
         byte[] key;
         key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
                 .generateSecret(
@@ -483,7 +512,7 @@ public class Alice {
             case CTR:
                 return new IvParameterSpec(initializationVector);
             case GCM:
-                return new GCMParameterSpec(ivLength << 3, initializationVector);
+                return new GCMParameterSpec(context.getGcmTagLength().bits(), initializationVector);
         }
 
         throw new IllegalArgumentException("Unknown mode");
@@ -495,7 +524,7 @@ public class Alice {
      * @return a byte array
      */
     private byte[] generateInitializationVector() {
-        byte[] initializationVector = new byte[ivLength];
+        byte[] initializationVector = new byte[context.getIvLength()];
 
         new SecureRandom().nextBytes(initializationVector);
 
