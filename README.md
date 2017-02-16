@@ -56,7 +56,7 @@ Iterations (used when the PBKDF = PBKDF2WithHmacSHA{Length})
 - Varies
 
 # Download
-The easist way is to use [jitpack](https://jitpack.io/#rockaport/alice/0.3.0)
+The easist way is to use [jitpack](https://jitpack.io/#rockaport/alice)
 
 # Initialization
 ```java
