@@ -77,7 +77,7 @@ public class Alice {
             case PBKDF_2_WITH_HMAC_SHA_256:
             case PBKDF_2_WITH_HMAC_SHA_384:
             case PBKDF_2_WITH_HMAC_SHA_512:
-                if (context.getIterations() < 0) {
+                if (context.getIterations() <= 0) {
                     throw new IllegalArgumentException("PBKDF is selected, but the number of iterations is invalid");
                 }
                 break;
