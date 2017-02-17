@@ -110,7 +110,11 @@ public class AliceContext {
          * <a href="http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf">FIPS PUB 46-3</a>
          */
         DES("DES"),
-
+        /**
+         * Triple DES Encryption (also known as DES-EDE, 3DES, or Triple-DES). Data is encrypted using the DES
+         * algorithm three separate times. It is first encrypted using the first subkey, then decrypted with the second
+         * subkey, and encrypted with the third subkey.
+         */
         DESede("DESede");
 
         private String value;
