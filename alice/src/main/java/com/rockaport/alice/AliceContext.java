@@ -109,7 +109,9 @@ public class AliceContext {
          * The Digital Encryption Standard as described in
          * <a href="http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf">FIPS PUB 46-3</a>
          */
-        DES("DES");
+        DES("DES"),
+
+        DESede("DESede");
 
         private String value;
 

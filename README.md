@@ -15,10 +15,11 @@ Alice provides an easy wrapper around the javax.crypto cipher suite for symmetri
 Algorithms
 - AES
 - DES
+- DESede (3DES)
 
 Modes
-- CBC (AES & DES)
-- CTR (AES & DES)
+- CBC (AES & DES & DESede)
+- CTR (AES & DES & DESede)
 - GCM (AES)
 
 Padding
@@ -28,20 +29,20 @@ Padding
 Key Lengths (in bits)
 - 64 (DES)
 - 128 (AES)
-- 192 (AES)
+- 192 (AES & DESede)
 - 256 (AES)
 
 Password Based Key Derivation Functions (PBKDF)
-- None (use password as is)
+- None (use password as is, zero padded if necessary)
 - SHA-{1, 224, 256, 384, 512} (hashes the password before use)
-- PBKDF2WithHmacSHA{1, 256, 384, 512} (derives the key using a Password-based key-derivation algorithm)
+- PBKDF2WithHmacSHA{1, 256, 384, 512} (derives the key using a password-based key-derivation algorithm)
 
 MAC Algorithm (Authenticated Encryption)
 - None
 - HmacSHA{1, 256, 384, 512}
 
 IV Length
-- 8 (DES)
+- 8 (DES & DESede)
 - 16 (AES-CBC/CTR mode)
 - Varies (GCM)
 
@@ -90,6 +91,15 @@ AliceContext aliceContext = new AliceContextBuilder()
 ```java
 AliceContext aliceContext = new AliceContextBuilder()
         .setAlgorithm(AliceContext.Algorithm.DES)
+        .setMode(AliceContext.Mode.CBC) // or AliceContext.Mode.CTR
+        .setIvLength(8)
+        .build()
+```
+
+## 3DES-CBC or CTR Context Initialization
+```java
+AliceContext aliceContext = new AliceContextBuilder()
+        .setAlgorithm(AliceContext.Algorithm.DESede)
         .setMode(AliceContext.Mode.CBC) // or AliceContext.Mode.CTR
         .setIvLength(8)
         .build()

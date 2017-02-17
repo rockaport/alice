@@ -93,7 +93,7 @@ public class Alice {
     }
 
     /**
-     * Generates an AES key
+     * Generates an AES, DES, or 3DES key
      *
      * @param algorithm the key will be used with
      * @param keyLength length of key
@@ -110,7 +110,8 @@ public class Alice {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.toString());
 
         int actualKeyLength = keyLength.bits();
-        if (keyLength == AliceContext.KeyLength.BITS_64) {
+
+        if (algorithm == AliceContext.Algorithm.DES) {
             actualKeyLength -= 8;
         }
 
@@ -485,6 +486,7 @@ public class Alice {
                 .digest(toBytes(password));
 
         byte[] key = new byte[context.getKeyLength().bytes()];
+
         System.arraycopy(hashedPassword, 0,
                 key, 0,
                 Math.min(context.getKeyLength().bytes(), hashedPassword.length));
@@ -494,8 +496,7 @@ public class Alice {
 
     private byte[] derivePbkdfKeyBytes(char[] password, byte[] initializationVector)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
-        byte[] key;
-        key = SecretKeyFactory.getInstance(context.getPbkdf().toString())
+        return SecretKeyFactory.getInstance(context.getPbkdf().toString())
                 .generateSecret(
                         new PBEKeySpec(
                                 password,
@@ -503,7 +504,6 @@ public class Alice {
                                 context.getIterations(),
                                 context.getKeyLength().bits()))
                 .getEncoded();
-        return key;
     }
 
     private AlgorithmParameterSpec getAlgorithmParameterSpec(AliceContext.Mode mode, byte[] initializationVector) {

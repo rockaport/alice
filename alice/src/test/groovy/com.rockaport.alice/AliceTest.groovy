@@ -306,10 +306,7 @@ class AliceTest extends Specification {
 
     def "AES CBC/CTR bytes encryption"() {
         setup:
-        AliceContext.Mode[] modes = [
-                AliceContext.Mode.CBC,
-                AliceContext.Mode.CTR
-        ]
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
 
@@ -420,10 +417,7 @@ class AliceTest extends Specification {
 
         FileUtils.writeByteArrayToFile(inputFile, plainText)
 
-        AliceContext.Mode[] modes = [
-                AliceContext.Mode.CBC,
-                AliceContext.Mode.CTR
-        ]
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
 
@@ -546,10 +540,7 @@ class AliceTest extends Specification {
 
     def "AES CBC/CTR bytes encryption fails with invalid password"() {
         setup:
-        AliceContext.Mode[] modes = [
-                AliceContext.Mode.CBC,
-                AliceContext.Mode.CTR
-        ]
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
 
@@ -672,10 +663,7 @@ class AliceTest extends Specification {
 
         FileUtils.writeByteArrayToFile(inputFile, plainText)
 
-        AliceContext.Mode[] modes = [
-                AliceContext.Mode.CBC,
-                AliceContext.Mode.CTR
-        ]
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
 
@@ -810,11 +798,7 @@ class AliceTest extends Specification {
 
     def "DES CBC/CTR bytes encryption"() {
         given:
-        AliceContext.Algorithm[] algorithms = [AliceContext.Algorithm.DES]
-
-        AliceContext.Mode[] modes = [
-                AliceContext.Mode.CBC,
-                AliceContext.Mode.CTR]
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
 
@@ -824,8 +808,7 @@ class AliceTest extends Specification {
 
         AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
 
-        def totalIterations = algorithms.length *
-                modes.length *
+        def totalIterations = modes.length *
                 paddings.length *
                 keyLengths.length *
                 pbkdfs.length *
@@ -834,7 +817,6 @@ class AliceTest extends Specification {
         when:
         def success = true
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
             int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
             int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
             int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
@@ -842,7 +824,7 @@ class AliceTest extends Specification {
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
-                    .setAlgorithm(algorithms[aidx])
+                    .setAlgorithm(AliceContext.Algorithm.DES)
                     .setMode(modes[midx])
                     .setPadding(paddings[pidx])
                     .setKeyLength(keyLengths[kidx])
@@ -868,11 +850,7 @@ class AliceTest extends Specification {
 
         FileUtils.writeByteArrayToFile(inputFile, plainText)
 
-        AliceContext.Algorithm[] algorithms = [AliceContext.Algorithm.DES]
-
-        AliceContext.Mode[] modes = [
-                AliceContext.Mode.CBC,
-                AliceContext.Mode.CTR]
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
 
@@ -882,8 +860,7 @@ class AliceTest extends Specification {
 
         AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
 
-        def totalIterations = algorithms.length *
-                modes.length *
+        def totalIterations = modes.length *
                 paddings.length *
                 keyLengths.length *
                 pbkdfs.length *
@@ -892,7 +869,6 @@ class AliceTest extends Specification {
         when:
         def success = true
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
             int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
             int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
             int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
@@ -900,7 +876,7 @@ class AliceTest extends Specification {
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
-                    .setAlgorithm(algorithms[aidx])
+                    .setAlgorithm(AliceContext.Algorithm.DES)
                     .setMode(modes[midx])
                     .setPadding(paddings[pidx])
                     .setKeyLength(keyLengths[kidx])
@@ -926,8 +902,6 @@ class AliceTest extends Specification {
 
     def "DES CBC/CTR bytes encryption fails with invalid password"() {
         given:
-        AliceContext.Algorithm[] algorithms = [AliceContext.Algorithm.DES]
-
         AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
@@ -938,8 +912,7 @@ class AliceTest extends Specification {
 
         AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
 
-        def totalIterations = algorithms.length *
-                modes.length *
+        def totalIterations = modes.length *
                 paddings.length *
                 keyLengths.length *
                 pbkdfs.length *
@@ -948,7 +921,6 @@ class AliceTest extends Specification {
         when:
         def failures = 0
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
             int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
             int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
             int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
@@ -956,7 +928,7 @@ class AliceTest extends Specification {
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
-                    .setAlgorithm(algorithms[aidx])
+                    .setAlgorithm(AliceContext.Algorithm.DES)
                     .setMode(modes[midx])
                     .setPadding(paddings[pidx])
                     .setKeyLength(keyLengths[kidx])
@@ -988,8 +960,6 @@ class AliceTest extends Specification {
 
         FileUtils.writeByteArrayToFile(inputFile, plainText)
 
-        AliceContext.Algorithm[] algorithms = [AliceContext.Algorithm.DES]
-
         AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
 
         AliceContext.Padding[] paddings = AliceContext.Padding.values()
@@ -1000,8 +970,7 @@ class AliceTest extends Specification {
 
         AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
 
-        def totalIterations = algorithms.length *
-                modes.length *
+        def totalIterations = modes.length *
                 paddings.length *
                 keyLengths.length *
                 pbkdfs.length *
@@ -1010,7 +979,6 @@ class AliceTest extends Specification {
         when:
         def failures = 0
         for (int i = 0; i < totalIterations; i++) {
-            int aidx = i.intdiv(modes.length * paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % algorithms.length
             int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
             int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
             int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
@@ -1018,7 +986,227 @@ class AliceTest extends Specification {
             int cidx = i % macAlgorithms.length
 
             Alice alice = new Alice(new AliceContextBuilder()
-                    .setAlgorithm(algorithms[aidx])
+                    .setAlgorithm(AliceContext.Algorithm.DES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(macAlgorithms[cidx])
+                    .setIvLength(8)
+                    .build())
+
+            try {
+                alice.encrypt(inputFile, encryptedFile, password)
+                alice.decrypt(encryptedFile, decryptedFile, badPassword)
+
+                if (!Arrays.equals(plainText, FileUtils.readFileToByteArray(decryptedFile))) {
+                    failures++
+                }
+            } catch (ignored) {
+                failures++
+            }
+        }
+
+        then:
+        failures == totalIterations
+
+        cleanup:
+        inputFile.delete()
+        encryptedFile.delete()
+        decryptedFile.delete()
+    }
+
+    def "3DES CBC/CTR bytes encryption"() {
+        given:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_192]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length *
+                macAlgorithms.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
+            int cidx = i % macAlgorithms.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DESede)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(macAlgorithms[cidx])
+                    .setIvLength(8)
+                    .build())
+
+            byte[] decryptedBytes = alice.decrypt(alice.encrypt(plainText, password), password)
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
+    }
+
+    def "3DES CBC/CTR file encryption"() {
+        given:
+        def inputFile = new File(inputFileName)
+        def encryptedFile = new File(encryptedFileName)
+        def decryptedFile = new File(decryptedFileName)
+
+        FileUtils.writeByteArrayToFile(inputFile, plainText)
+
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_192]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length *
+                macAlgorithms.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
+            int cidx = i % macAlgorithms.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DESede)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(macAlgorithms[cidx])
+                    .setIvLength(8)
+                    .build())
+
+            alice.encrypt(inputFile, encryptedFile, password)
+            alice.decrypt(encryptedFile, decryptedFile, password)
+
+            success &= Arrays.equals(plainText, FileUtils.readFileToByteArray(decryptedFile))
+        }
+
+        then:
+        success
+
+        cleanup:
+        inputFile.delete()
+        encryptedFile.delete()
+        decryptedFile.delete()
+    }
+
+    def "3DES CBC/CTR bytes encryption fails with invalid password"() {
+        given:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_192]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length *
+                macAlgorithms.length
+
+        when:
+        def failures = 0
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
+            int cidx = i % macAlgorithms.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DESede)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(macAlgorithms[cidx])
+                    .setIvLength(8)
+                    .build())
+
+            try {
+                byte[] decryptedBytes = alice.decrypt(alice.encrypt(plainText, password), badPassword)
+
+                if (!Arrays.equals(plainText, decryptedBytes)) {
+                    failures++
+                }
+            } catch (ignored) {
+                failures++
+            }
+        }
+
+        then:
+        failures == totalIterations
+    }
+
+    def "3DES CBC/CTR file encryption fails with invalid password"() {
+        given:
+        def inputFile = new File(inputFileName)
+        def encryptedFile = new File(encryptedFileName)
+        def decryptedFile = new File(decryptedFileName)
+
+        FileUtils.writeByteArrayToFile(inputFile, plainText)
+
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_192]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        AliceContext.MacAlgorithm[] macAlgorithms = AliceContext.MacAlgorithm.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length *
+                macAlgorithms.length
+
+        when:
+        def failures = 0
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * macAlgorithms.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * macAlgorithms.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * macAlgorithms.length) % keyLengths.length
+            int bidx = i.intdiv(macAlgorithms.length) % pbkdfs.length
+            int cidx = i % macAlgorithms.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DESede)
                     .setMode(modes[midx])
                     .setPadding(paddings[pidx])
                     .setKeyLength(keyLengths[kidx])
