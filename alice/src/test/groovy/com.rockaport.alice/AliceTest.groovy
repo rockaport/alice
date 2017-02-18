@@ -54,12 +54,11 @@ class AliceTest extends Specification {
 
     def "Instantiation throws an exception with invalid CBC/CTR inputs"() {
         when:
-        AliceContext aliceContext = new AliceContextBuilder()
+        new Alice(new AliceContextBuilder()
                 .setAlgorithm(AliceContext.Algorithm.AES)
                 .setMode(input)
                 .setIvLength(1)
-                .build()
-        new Alice(aliceContext)
+                .build())
 
         then:
         thrown(expectedException)
@@ -72,13 +71,12 @@ class AliceTest extends Specification {
 
     def "Instantiation throws an exception with invalid GCM inputs"() {
         when:
-        AliceContext aliceContext = new AliceContextBuilder()
+        new Alice(new AliceContextBuilder()
                 .setAlgorithm(AliceContext.Algorithm.AES)
                 .setMode(AliceContext.Mode.GCM)
                 .setIvLength(ivLength)
                 .setGcmTagLength(gcmTagLength)
-                .build()
-        new Alice(aliceContext)
+                .build())
 
         then:
         thrown(expectedException)
@@ -94,10 +92,9 @@ class AliceTest extends Specification {
 
     def "Instantiation throws an exception with invalid PBKDF iterations"() {
         when:
-        AliceContext aliceContext = new AliceContextBuilder()
+        new Alice(new AliceContextBuilder()
                 .setIterations(iterations)
-                .build()
-        new Alice(aliceContext)
+                .build())
 
         then:
         thrown(expectedException)
@@ -110,8 +107,7 @@ class AliceTest extends Specification {
 
     def "Byte encryption throws with invalid inputs"() {
         when:
-        Alice alice = new Alice(new AliceContextBuilder().build())
-        alice.encrypt(inputBytes as byte[], inputPassword as char[])
+        new Alice(new AliceContextBuilder().build()).encrypt(inputBytes as byte[], inputPassword as char[])
 
         then:
         thrown(expectedException)
@@ -162,7 +158,7 @@ class AliceTest extends Specification {
         emptyFile.createNewFile()
 
         when:
-        new Alice(new AliceContextBuilder().build()).encrypt(input, output, inputPassword)
+        new Alice(new AliceContextBuilder().build()).encrypt(input as File, output as File, inputPassword)
 
         then:
         thrown(expectedException)
@@ -223,7 +219,7 @@ class AliceTest extends Specification {
         new Alice(new AliceContextBuilder().build()).encrypt(inputFile, encryptedFile, password)
 
         when:
-        new Alice(new AliceContextBuilder().build()).decrypt(input, output, inputPassword)
+        new Alice(new AliceContextBuilder().build()).decrypt(input as File, output as File, inputPassword)
 
         then:
         thrown(expectedException)
@@ -275,6 +271,80 @@ class AliceTest extends Specification {
 
         new File(encryptedFileName)   | new File(decryptedFileName) | null          || IllegalArgumentException
         new File(encryptedFileName)   | new File(decryptedFileName) | new char[0]   || IllegalArgumentException
+    }
+
+    def "Stream encryption throws with invalid inputs"() {
+        when:
+        Alice alice = new Alice(new AliceContextBuilder().setMacAlgorithm(mac).build())
+        alice.encrypt(inputStream as InputStream, outputStream as OutputStream, inputPassword)
+
+        then:
+        thrown(expectedException)
+
+        where:
+        inputStream                | outputStream                | inputPassword | mac                                    || expectedException
+        null                       | null                        | null          | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | null                        | null          | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | null                        | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | null                        | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | null                        | new char[1]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | null                        | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | new ByteArrayOutputStream() | new char[1]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | new ByteArrayOutputStream() | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | null                        | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        new ByteArrayInputStream() | null                        | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | null                        | new char[1]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        new ByteArrayInputStream() | null                        | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        new ByteArrayInputStream() | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | new ByteArrayOutputStream() | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+    }
+
+    def "Stream decryption throws with invalid inputs"() {
+        when:
+        Alice alice = new Alice(new AliceContextBuilder().setMacAlgorithm(mac).build())
+        alice.decrypt(inputStream as InputStream, outputStream as OutputStream, inputPassword)
+
+        then:
+        thrown(expectedException)
+
+        where:
+        inputStream                | outputStream                | inputPassword | mac                                    || expectedException
+        null                       | null                        | null          | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | null                        | null          | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | null                        | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | null                        | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | null                        | new char[1]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | null                        | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        null                       | new ByteArrayOutputStream() | new char[1]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        null                       | new ByteArrayOutputStream() | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | null                        | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        new ByteArrayInputStream() | null                        | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | null                        | new char[1]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        new ByteArrayInputStream() | null                        | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.NONE         || IllegalArgumentException
+        new ByteArrayInputStream() | new ByteArrayOutputStream() | new char[0]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
+
+        new ByteArrayInputStream() | new ByteArrayOutputStream() | new char[1]   | AliceContext.MacAlgorithm.HMAC_SHA_512 || IllegalArgumentException
     }
 
     def "Generate key throws with invalid arguments"() {
@@ -538,6 +608,115 @@ class AliceTest extends Specification {
         decryptedFile.delete()
     }
 
+    def "AES CBC/CTR stream encryption"() {
+        setup:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length) % keyLengths.length
+            int bidx = i % pbkdfs.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(16)
+                    .build())
+
+            ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+            alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+            ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+            alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, password)
+
+            byte[] decryptedBytes = decryptedStream.toByteArray()
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
+    }
+
+    def "AES GCM stream encryption"() {
+        setup:
+        AliceContext.Mode[] modes = [AliceContext.Mode.GCM]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        AliceContext.GcmTagLength[] gcmTagLengths = AliceContext.GcmTagLength.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length *
+                gcmTagLengths.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * gcmTagLengths.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * gcmTagLengths.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * gcmTagLengths.length) % keyLengths.length
+            int bidx = i.intdiv(gcmTagLengths.length) % pbkdfs.length
+            int gidx = i % gcmTagLengths.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(16)
+                    .setGcmTagLength(gcmTagLengths[gidx])
+                    .build())
+
+            ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+            alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+            ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+            alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, password)
+
+            byte[] decryptedBytes = decryptedStream.toByteArray()
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
+    }
+
     def "AES CBC/CTR bytes encryption fails with invalid password"() {
         setup:
         AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
@@ -796,6 +975,115 @@ class AliceTest extends Specification {
         decryptedFile.delete()
     }
 
+    def "AES CBC/CTR stream encryption fails with invalid password"() {
+        setup:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length
+
+        when:
+        def failures = 0
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length) % keyLengths.length
+            int bidx = i % pbkdfs.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(16)
+                    .build())
+
+            try {
+                byte[] decryptedBytes = alice.decrypt(alice.encrypt(plainText, password), badPassword)
+
+                if (!Arrays.equals(plainText, decryptedBytes)) {
+                    failures++
+                }
+            } catch (ignored) {
+                failures++
+            }
+        }
+
+        then:
+        failures == totalIterations
+    }
+
+    def "AES GCM stream encryption fails with invalid password"() {
+        setup:
+        AliceContext.Mode[] modes = [AliceContext.Mode.GCM]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        AliceContext.GcmTagLength[] gcmTagLengths = AliceContext.GcmTagLength.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length *
+                gcmTagLengths.length
+
+        when:
+        def failures = 0
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length * gcmTagLengths.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length * gcmTagLengths.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length * gcmTagLengths.length) % keyLengths.length
+            int bidx = i.intdiv(gcmTagLengths.length) % pbkdfs.length
+            int gidx = i % gcmTagLengths.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(16)
+                    .setGcmTagLength(gcmTagLengths[gidx])
+                    .build())
+
+            try {
+                byte[] decryptedBytes = alice.decrypt(alice.encrypt(plainText, password), badPassword)
+
+                if (!Arrays.equals(plainText, decryptedBytes)) {
+                    failures++
+                }
+            } catch (ignored) {
+                failures++
+            }
+        }
+
+        then:
+        failures == totalIterations
+    }
+
     def "DES CBC/CTR bytes encryption"() {
         given:
         AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
@@ -898,6 +1186,55 @@ class AliceTest extends Specification {
         inputFile.delete()
         encryptedFile.delete()
         decryptedFile.delete()
+    }
+
+
+    def "DES CBC/CTR stream encryption"() {
+        setup:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_64]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length) % keyLengths.length
+            int bidx = i % pbkdfs.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(8)
+                    .build())
+
+            ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+            alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+            ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+            alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, password)
+
+            byte[] decryptedBytes = decryptedStream.toByteArray()
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
     }
 
     def "DES CBC/CTR bytes encryption fails with invalid password"() {
@@ -1016,6 +1353,59 @@ class AliceTest extends Specification {
         decryptedFile.delete()
     }
 
+    def "DES CBC/CTR stream encryption fails with invalid password"() {
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_64]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length
+
+        when:
+        def failures = 0
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length) % keyLengths.length
+            int bidx = i % pbkdfs.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DES)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(8)
+                    .build())
+
+            try {
+                ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+                alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+                ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+                alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, badPassword)
+
+                byte[] decryptedBytes = decryptedStream.toByteArray()
+
+                if (!Arrays.equals(plainText, decryptedBytes)) {
+                    failures++
+                }
+            } catch (ignored) {
+                failures++
+            }
+        }
+
+        then:
+        failures == totalIterations
+    }
+
     def "3DES CBC/CTR bytes encryption"() {
         given:
         AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
@@ -1118,6 +1508,54 @@ class AliceTest extends Specification {
         inputFile.delete()
         encryptedFile.delete()
         decryptedFile.delete()
+    }
+
+    def "3DES CBC/CTR stream encryption"() {
+        given:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_192]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length) % keyLengths.length
+            int bidx = i % pbkdfs.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DESede)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(8)
+                    .build())
+
+            ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+            alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+            ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+            alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, password)
+
+            byte[] decryptedBytes = decryptedStream.toByteArray()
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
     }
 
     def "3DES CBC/CTR bytes encryption fails with invalid password"() {
@@ -1234,5 +1672,59 @@ class AliceTest extends Specification {
         inputFile.delete()
         encryptedFile.delete()
         decryptedFile.delete()
+    }
+
+    def "3DES CBC/CTR stream encryption fails with invalid password"() {
+        given:
+        AliceContext.Mode[] modes = [AliceContext.Mode.CBC, AliceContext.Mode.CTR]
+
+        AliceContext.Padding[] paddings = AliceContext.Padding.values()
+
+        AliceContext.KeyLength[] keyLengths = [AliceContext.KeyLength.BITS_192]
+
+        AliceContext.Pbkdf[] pbkdfs = AliceContext.Pbkdf.values()
+
+        def totalIterations = modes.length *
+                paddings.length *
+                keyLengths.length *
+                pbkdfs.length
+
+        when:
+        def failures = 0
+        for (int i = 0; i < totalIterations; i++) {
+            int midx = i.intdiv(paddings.length * keyLengths.length * pbkdfs.length) % modes.length
+            int pidx = i.intdiv(keyLengths.length * pbkdfs.length) % paddings.length
+            int kidx = i.intdiv(pbkdfs.length) % keyLengths.length
+            int bidx = i % pbkdfs.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.DESede)
+                    .setMode(modes[midx])
+                    .setPadding(paddings[pidx])
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(pbkdfs[bidx])
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(8)
+                    .build())
+
+            try {
+                ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+                alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+                ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+                alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, badPassword)
+
+                byte[] decryptedBytes = decryptedStream.toByteArray()
+
+                if (!Arrays.equals(plainText, decryptedBytes)) {
+                    failures++
+                }
+            } catch (ignored) {
+                failures++
+            }
+        }
+
+        then:
+        failures == totalIterations
     }
 }

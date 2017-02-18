@@ -6,7 +6,7 @@ CI](https://circleci.com/gh/rockaport/alice.svg?style=shield)](https://circleci.
 [![codebeat badge](https://codebeat.co/badges/03c01973-7f17-4aa9-8c5f-42c1e6a45d24)](https://codebeat.co/projects/github-com-rockaport-alice)
 
 # alice
-Alice is a Java AES encryption library for working with byte arrays and files. Various key lengths, block modes, padding schemes, key deriviation functions, and Message Authentication Codes (MAC) are available. See the [javadoc](https://rockaport.github.io/alice) for more information.
+Alice is a Java AES encryption library for working with byte arrays, files, and streams. Various key lengths, block modes, padding schemes, key deriviation functions, and Message Authentication Codes (MAC) are available. See the [javadoc](https://rockaport.github.io/alice) for more information.
 
 Alice provides an easy wrapper around the javax.crypto cipher suite for symmetric key encryption. if a MAC algorithm is selected, additional [Authenticated Encryption](https://en.wikipedia.org/wiki/Authenticated_encryption) is performed using an [encrypt-then-mac](https://en.wikipedia.org/wiki/Authenticated_encryption#Encrypt-then-MAC_.28EtM.29) scheme.
 
@@ -59,7 +59,8 @@ Iterations (used when the PBKDF = PBKDF2WithHmacSHA{Length})
 # Download
 The easist way is to use [jitpack](https://jitpack.io/#rockaport/alice)
 
-# Initialization
+# Usage
+## Initialization
 ```java
 // Initialize an Alice instance with defaults:
 // Cipher = AES/256/CTR/NoPadding
@@ -68,7 +69,7 @@ The easist way is to use [jitpack](https://jitpack.io/#rockaport/alice)
 Alice alice = new Alice(new AliceContextBuilder().build());
 ```
 
-## AES-CBC or CTR context initialization
+### AES-CBC or CTR context initialization
 ```java
 AliceContext aliceContext = new AliceContextBuilder()
         .setAlgorithm(AliceContext.Algorithm.AES)
@@ -77,7 +78,7 @@ AliceContext aliceContext = new AliceContextBuilder()
         .build()
 ```
 
-## AES-GCM Context Initialization
+### AES-GCM Context Initialization
 ```java
 AliceContext aliceContext = new AliceContextBuilder()
         .setAlgorithm(AliceContext.Algorithm.AES)
@@ -87,7 +88,7 @@ AliceContext aliceContext = new AliceContextBuilder()
         .build()
 ```
 
-## DES-CBC or CTR Context Initialization
+### DES-CBC or CTR Context Initialization
 ```java
 AliceContext aliceContext = new AliceContextBuilder()
         .setAlgorithm(AliceContext.Algorithm.DES)
@@ -96,7 +97,7 @@ AliceContext aliceContext = new AliceContextBuilder()
         .build()
 ```
 
-## 3DES-CBC or CTR Context Initialization
+### 3DES-CBC or CTR Context Initialization
 ```java
 AliceContext aliceContext = new AliceContextBuilder()
         .setAlgorithm(AliceContext.Algorithm.DESede)
@@ -105,19 +106,27 @@ AliceContext aliceContext = new AliceContextBuilder()
         .build()
 ```
 
-# Usage
-After you've created an Alice instance with the desired context you can encrypt/decrypt byte arrays and files as shown.
+## Encryption
+After you've created an Alice instance with the desired context you can encrypt/decrypt byte arrays and files as shown. See the unit tests for more detailed usage and options.
 
-## Working with byte arrays
+### Working with byte arrays
 ```java
 byte[] encryptedBytes = alice.encrypt(input, password);
 
 byte[] decryptedBytes = alice.decrypt(encryptedBytes, password);
 ```
 
-## Working with files
+### Working with files
 ```java
 alice.encrypt(inputFile, encryptedFile, password);
 
 alice.decrypt(encryptedFile, decryptedFile, password);
+```
+
+### Working with streams
+Note: Streaming encryption does not support authenticated encryption. You must set the mac algorithm to AliceContext.MacAlgorithm.NONE
+```java
+alice.encrypt(inputStream, encryptedStream, password);
+
+alice.decrypt(encryptedStream, decryptedStream, password);
 ```

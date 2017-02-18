@@ -278,6 +278,65 @@ public class Alice {
     }
 
     /**
+     * Encrypts the input stream using the supplied password
+     *
+     * @param input    the input file
+     * @param output   the output file
+     * @param password the password
+     * @throws GeneralSecurityException if initialization or encryption fails
+     * @throws IOException              if there's a failure to read/write from/to the input/output stream
+     */
+    @SuppressWarnings("WeakerAccess")
+    public synchronized void encrypt(InputStream input, OutputStream output, char[] password)
+            throws GeneralSecurityException, IOException {
+        if (input == null || output == null) {
+            throw new IllegalArgumentException("Input or output stream is null");
+        }
+
+        if (password == null || password.length == 0) {
+            throw new IllegalArgumentException("Password is either null or empty");
+        }
+
+        if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
+            throw new IllegalArgumentException("Streaming encryption does not support authenticated encryption");
+        }
+
+        BufferedInputStream bufferedInputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+
+        try {
+            // generate the initialization vector
+            byte[] initializationVector = generateInitializationVector();
+
+            // initialize the cipher
+            cipher.init(Cipher.ENCRYPT_MODE,
+                    deriveKey(password, initializationVector),
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+
+            // setup streams
+            bufferedInputStream = new BufferedInputStream(input);
+            bufferedOutputStream = new BufferedOutputStream(output);
+
+            // write the initialization vector
+            bufferedOutputStream.write(initializationVector);
+
+            // allocate variables
+            int bytesRead;
+            byte[] inputStreamBuffer = new byte[4096];
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+                // encrypt
+                bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, bytesRead));
+            }
+
+            // finalize and write the cipher
+            bufferedOutputStream.write(cipher.doFinal());
+        } finally {
+            closeStream(bufferedInputStream);
+            closeStream(bufferedOutputStream);
+        }
+    }
+
+    /**
      * Decrypts a byte array using the supplied password
      *
      * @param input    the byte array input
@@ -432,6 +491,69 @@ public class Alice {
             if (mac != null && !Arrays.equals(recMac, mac.doFinal())) {
                 throw new GeneralSecurityException("Received mac is different from calculated");
             }
+        } finally {
+            closeStream(bufferedInputStream);
+            closeStream(bufferedOutputStream);
+        }
+    }
+
+    /**
+     * Decrypts an input stream using the supplied password
+     *
+     * @param input    the input file
+     * @param output   the output file
+     * @param password the password
+     * @throws GeneralSecurityException if initialization or decryption fails
+     * @throws IOException              if there's a failure to read/write from/to the input/output stream
+     */
+    @SuppressWarnings("WeakerAccess")
+    public synchronized void decrypt(InputStream input, OutputStream output, char[] password)
+            throws GeneralSecurityException, IOException {
+        if (input == null || output == null) {
+            throw new IllegalArgumentException("Input or output stream is null");
+        }
+
+        if (password == null || password.length == 0) {
+            throw new IllegalArgumentException("Password is either null or empty");
+        }
+
+        if (context.getMacAlgorithm() != AliceContext.MacAlgorithm.NONE) {
+            throw new IllegalArgumentException("Streaming decryption does not support authenticated encryption");
+        }
+
+        BufferedInputStream bufferedInputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+
+        try {
+            // setup streams
+            bufferedOutputStream = new BufferedOutputStream(output);
+            bufferedInputStream = new BufferedInputStream(input);
+
+            // read the initialization vector
+            byte[] initializationVector = new byte[context.getIvLength()];
+
+            int ivBytesRead = bufferedInputStream.read(initializationVector);
+
+            if (ivBytesRead < context.getIvLength()) {
+                throw new IOException("Stream does not contain IV");
+            }
+
+            // initialize the cipher
+            cipher.init(Cipher.DECRYPT_MODE,
+                    deriveKey(password, initializationVector),
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+
+            // allocate loop buffers and variables
+            int bytesRead;
+            byte[] inputStreamBuffer = new byte[4096];
+
+            // decrypt
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+                bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, bytesRead));
+            }
+
+            // finalize the cipher
+            bufferedOutputStream.write(cipher.doFinal());
         } finally {
             closeStream(bufferedInputStream);
             closeStream(bufferedOutputStream);
