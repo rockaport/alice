@@ -3,7 +3,6 @@ CI](https://circleci.com/gh/rockaport/alice.svg?style=shield)](https://circleci.
 [![Build Status](https://travis-ci.org/rockaport/alice.svg?branch=master)](https://travis-ci.org/rockaport/alice)
 [![Release](https://jitpack.io/v/rockaport/alice.svg)](https://jitpack.io/#rockaport/alice)
 [![codecov](https://codecov.io/gh/rockaport/alice/branch/master/graph/badge.svg)](https://codecov.io/gh/rockaport/alice)
-[![codebeat badge](https://codebeat.co/badges/03c01973-7f17-4aa9-8c5f-42c1e6a45d24)](https://codebeat.co/projects/github-com-rockaport-alice)
 
 # alice
 Alice is a Java AES encryption library for working with byte arrays, files, and streams. Various key lengths, block modes, padding schemes, key deriviation functions, and Message Authentication Codes (MAC) are available. See the [javadoc](https://rockaport.github.io/alice) for more information.
