@@ -174,9 +174,7 @@ public class Alice {
         byte[] initializationVector = generateInitializationVector();
 
         // initialize the cipher
-        cipher.init(Cipher.ENCRYPT_MODE,
-                deriveKey(password, initializationVector),
-                getAlgorithmParameterSpec(context.getMode(), initializationVector));
+        cipherInit(Cipher.ENCRYPT_MODE, password, initializationVector);
 
         // encrypt
         byte[] encryptedBytes = cipher.doFinal(input);
@@ -184,7 +182,9 @@ public class Alice {
         // construct the output (IV || CIPHER)
         Buffer output = new Buffer();
 
-        output.write(cipher.getIV());
+        if (context.getMode() != AliceContext.Mode.ECB) {
+            output.write(cipher.getIV());
+        }
         output.write(encryptedBytes);
 
         // compute the MAC if needed and append the MAC (IV || CIPHER || MAC)
@@ -227,9 +227,7 @@ public class Alice {
             byte[] initializationVector = generateInitializationVector();
 
             // initialize the cipher
-            cipher.init(Cipher.ENCRYPT_MODE,
-                    deriveKey(password, initializationVector),
-                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+            cipherInit(Cipher.ENCRYPT_MODE, password, initializationVector);
 
             // initialize the mac if needed
             Mac mac = null;
@@ -248,7 +246,9 @@ public class Alice {
             bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(output));
 
             // write the initialization vector
-            bufferedOutputStream.write(initializationVector);
+            if (context.getMode() != AliceContext.Mode.ECB) {
+                bufferedOutputStream.write(initializationVector);
+            }
 
             while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
                 // encrypt
@@ -309,16 +309,16 @@ public class Alice {
             byte[] initializationVector = generateInitializationVector();
 
             // initialize the cipher
-            cipher.init(Cipher.ENCRYPT_MODE,
-                    deriveKey(password, initializationVector),
-                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+            cipherInit(Cipher.ENCRYPT_MODE, password, initializationVector);
 
             // setup streams
             bufferedInputStream = new BufferedInputStream(input);
             bufferedOutputStream = new BufferedOutputStream(output);
 
             // write the initialization vector
-            bufferedOutputStream.write(initializationVector);
+            if (context.getMode() != AliceContext.Mode.ECB) {
+                bufferedOutputStream.write(initializationVector);
+            }
 
             // allocate variables
             int bytesRead;
@@ -333,6 +333,16 @@ public class Alice {
         } finally {
             closeStream(bufferedInputStream);
             closeStream(bufferedOutputStream);
+        }
+    }
+
+    private void cipherInit(int mode, char[] password, byte[] initializationVector) throws GeneralSecurityException {
+        if (context.getMode() == AliceContext.Mode.ECB) {
+            cipher.init(mode, deriveKey(password, initializationVector));
+        } else {
+            cipher.init(mode,
+                    deriveKey(password, initializationVector),
+                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
         }
     }
 
@@ -378,9 +388,7 @@ public class Alice {
         }
 
         // initialize the cipher
-        cipher.init(Cipher.DECRYPT_MODE,
-                deriveKey(password, initializationVector),
-                getAlgorithmParameterSpec(context.getMode(), initializationVector));
+        cipherInit(Cipher.DECRYPT_MODE, password, initializationVector);
 
         return cipher.doFinal(cipherText);
     }
@@ -448,9 +456,7 @@ public class Alice {
             }
 
             // initialize the cipher
-            cipher.init(Cipher.DECRYPT_MODE,
-                    deriveKey(password, initializationVector),
-                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+            cipherInit(Cipher.DECRYPT_MODE, password, initializationVector);
 
             // allocate loop buffers and variables
             int bytesRead;
@@ -539,9 +545,7 @@ public class Alice {
             }
 
             // initialize the cipher
-            cipher.init(Cipher.DECRYPT_MODE,
-                    deriveKey(password, initializationVector),
-                    getAlgorithmParameterSpec(context.getMode(), initializationVector));
+            cipherInit(Cipher.DECRYPT_MODE, password, initializationVector);
 
             // allocate loop buffers and variables
             int bytesRead;

@@ -144,6 +144,11 @@ public class AliceContext {
          */
         CTR("CTR"),
         /**
+         * Electronic Codebook Mode, as defined in <a href="http://csrc.nist.gov/publications/fips/fips81/fips81.htm">
+         * FIPS PUB 81</a>
+         */
+        ECB("ECB"),
+        /**
          * Galois/Counter Mode, as defined in
          * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>.
          */

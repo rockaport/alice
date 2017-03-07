@@ -21,6 +21,7 @@ class AliceContextTest extends Specification {
         input || output
         "CBC" || AliceContext.Mode.CBC
         "CTR" || AliceContext.Mode.CTR
+        "ECB" || AliceContext.Mode.ECB
         "GCM" || AliceContext.Mode.GCM
     }
 

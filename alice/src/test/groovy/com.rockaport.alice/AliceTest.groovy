@@ -3,6 +3,7 @@ package com.rockaport.alice
 import com.rockaport.alice.AliceContext
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -424,6 +425,40 @@ class AliceTest extends Specification {
         success
     }
 
+    def "AES ECB bytes encryption"() {
+        setup:
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        def totalIterations = keyLengths.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int kidx = i % keyLengths.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(AliceContext.Mode.ECB)
+                    .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(AliceContext.Pbkdf.NONE)
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(0)
+                    .build())
+
+            byte[] decryptedBytes = alice.decrypt(alice.encrypt(plainText, password), password)
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
+    }
+
     def "AES GCM bytes encryption"() {
         setup:
         AliceContext.Mode[] modes = [AliceContext.Mode.GCM]
@@ -524,6 +559,52 @@ class AliceTest extends Specification {
                     .setPbkdf(pbkdfs[bidx])
                     .setMacAlgorithm(macAlgorithms[cidx])
                     .setIvLength(16)
+                    .build())
+
+            alice.encrypt(inputFile, encryptedFile, password)
+            alice.decrypt(encryptedFile, decryptedFile, password)
+
+            success &= Arrays.equals(plainText, FileUtils.readFileToByteArray(decryptedFile))
+        }
+
+        then:
+        success
+
+        cleanup:
+        inputFile.delete()
+        encryptedFile.delete()
+        decryptedFile.delete()
+    }
+
+    def "AES ECB file encryption"() {
+        setup:
+        def inputFile = new File(inputFileName)
+        def encryptedFile = new File(encryptedFileName)
+        def decryptedFile = new File(decryptedFileName)
+
+        FileUtils.writeByteArrayToFile(inputFile, plainText)
+
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        def totalIterations = keyLengths.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int kidx = i % keyLengths.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(AliceContext.Mode.ECB)
+                    .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(AliceContext.Pbkdf.NONE)
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(0)
                     .build())
 
             alice.encrypt(inputFile, encryptedFile, password)
@@ -643,6 +724,46 @@ class AliceTest extends Specification {
                     .setPbkdf(pbkdfs[bidx])
                     .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
                     .setIvLength(16)
+                    .build())
+
+            ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
+            alice.encrypt(new ByteArrayInputStream(plainText), encryptedStream, password)
+
+            ByteArrayOutputStream decryptedStream = new ByteArrayOutputStream()
+            alice.decrypt(new ByteArrayInputStream(encryptedStream.toByteArray()), decryptedStream, password)
+
+            byte[] decryptedBytes = decryptedStream.toByteArray()
+
+            success &= Arrays.equals(plainText, decryptedBytes)
+        }
+
+        then:
+        success
+    }
+
+    def "AES ECB stream encryption"() {
+        setup:
+        AliceContext.KeyLength[] keyLengths = [
+                AliceContext.KeyLength.BITS_128,
+                AliceContext.KeyLength.BITS_192,
+                AliceContext.KeyLength.BITS_256
+        ]
+
+        def totalIterations = keyLengths.length
+
+        when:
+        def success = true
+        for (int i = 0; i < totalIterations; i++) {
+            int kidx = i % keyLengths.length
+
+            Alice alice = new Alice(new AliceContextBuilder()
+                    .setAlgorithm(AliceContext.Algorithm.AES)
+                    .setMode(AliceContext.Mode.ECB)
+                    .setPadding(AliceContext.Padding.PKCS5_PADDING)
+                    .setKeyLength(keyLengths[kidx])
+                    .setPbkdf(AliceContext.Pbkdf.NONE)
+                    .setMacAlgorithm(AliceContext.MacAlgorithm.NONE)
+                    .setIvLength(0)
                     .build())
 
             ByteArrayOutputStream encryptedStream = new ByteArrayOutputStream()
