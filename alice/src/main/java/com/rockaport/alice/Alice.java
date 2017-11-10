@@ -250,7 +250,7 @@ public class Alice {
             // write the initialization vector
             bufferedOutputStream.write(initializationVector);
 
-            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) != -1) {
                 // encrypt
                 encryptedBytes = cipher.update(inputStreamBuffer, 0, bytesRead);
 
@@ -323,7 +323,7 @@ public class Alice {
             // allocate variables
             int bytesRead;
             byte[] inputStreamBuffer = new byte[4096];
-            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) != -1) {
                 // encrypt
                 bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, bytesRead));
             }
@@ -464,7 +464,7 @@ public class Alice {
             }
 
             // decrypt
-            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) != -1) {
                 numBytesToProcess = (bytesRead < bytesLeft) ? bytesRead : (int) bytesLeft;
 
                 if (numBytesToProcess <= 0) {
@@ -548,7 +548,7 @@ public class Alice {
             byte[] inputStreamBuffer = new byte[4096];
 
             // decrypt
-            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) > 0) {
+            while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) != -1) {
                 bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, bytesRead));
             }
 
