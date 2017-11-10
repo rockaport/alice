@@ -241,7 +241,7 @@ public class Alice {
             // allocate variables
             int bytesRead;
             byte[] encryptedBytes;
-            byte[] inputStreamBuffer = new byte[4096];
+            byte[] inputStreamBuffer = new byte[1024];
 
             // setup streams
             bufferedInputStream = new BufferedInputStream(new FileInputStream(input));
@@ -322,7 +322,7 @@ public class Alice {
 
             // allocate variables
             int bytesRead;
-            byte[] inputStreamBuffer = new byte[4096];
+            byte[] inputStreamBuffer = new byte[1024];
             while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) != -1) {
                 // encrypt
                 bufferedOutputStream.write(cipher.update(inputStreamBuffer, 0, bytesRead));
@@ -455,7 +455,7 @@ public class Alice {
             // allocate loop buffers and variables
             int bytesRead;
             int numBytesToProcess;
-            byte[] inputStreamBuffer = new byte[4096];
+            byte[] inputStreamBuffer = new byte[1024];
             long bytesLeft = input.length() - context.getIvLength();
 
             // subtract the mac length if enabled
@@ -545,7 +545,7 @@ public class Alice {
 
             // allocate loop buffers and variables
             int bytesRead;
-            byte[] inputStreamBuffer = new byte[4096];
+            byte[] inputStreamBuffer = new byte[1024];
 
             // decrypt
             while ((bytesRead = bufferedInputStream.read(inputStreamBuffer)) != -1) {
