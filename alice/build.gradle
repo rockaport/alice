@@ -8,8 +8,6 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    compile 'com.squareup.okio:okio:1.11.0'
-
     compile "org.codehaus.groovy:groovy-all:2.4.1"
 
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-3'
@@ -33,7 +31,7 @@ task codeCoverageReport(type: JacocoReport) {
 
     reports {
         xml.enabled true
-        xml.destination "${buildDir}/reports/jacoco/report.xml"
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
         html.enabled true
         csv.enabled false
     }

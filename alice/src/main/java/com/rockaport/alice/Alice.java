@@ -1,7 +1,5 @@
 package com.rockaport.alice;
 
-import okio.Buffer;
-
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
@@ -159,9 +157,10 @@ public class Alice {
      * @param password the password
      * @return an encrypted byte array
      * @throws GeneralSecurityException if initialization or encryption fails
+     * @throws IOException if there's a problem constructing the result
      */
     @SuppressWarnings("WeakerAccess")
-    public synchronized byte[] encrypt(byte[] input, char[] password) throws GeneralSecurityException {
+    public synchronized byte[] encrypt(byte[] input, char[] password) throws GeneralSecurityException, IOException {
         if (input == null || input.length == 0) {
             throw new IllegalArgumentException("Input is either null or empty");
         }
@@ -182,7 +181,7 @@ public class Alice {
         byte[] encryptedBytes = cipher.doFinal(input);
 
         // construct the output (IV || CIPHER)
-        Buffer output = new Buffer();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         output.write(cipher.getIV());
         output.write(encryptedBytes);
@@ -192,7 +191,7 @@ public class Alice {
             output.write(getMac(context.getMacAlgorithm(), password).doFinal(encryptedBytes));
         }
 
-        return output.readByteArray();
+        return output.toByteArray();
     }
 
     /**
